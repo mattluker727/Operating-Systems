@@ -9,23 +9,14 @@
 
 // * Pay special attention to time units, data types, and removing unnecessary code between measurements.
 
-
-
-
 #include <time.h>
 #include <sys/time.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-int main(int argc, char **argv)
+int main()
 {
-  if (argc < 2)
-    {
-      printf("USAGE: %s loop-iterations\n", argv[0]);
-      return 1;
-    }
-
-  int iterations = atoi(argv[1]);
+  int iterations = 1000000;
 
   struct timeval start, end;
 
@@ -38,8 +29,13 @@ int main(int argc, char **argv)
 
   gettimeofday(&end, NULL);
 
-  printf("%ld\n", ((end.tv_sec * 1000000 + end.tv_usec)
-		  - (start.tv_sec * 1000000 + start.tv_usec)));
+  int totalTime = (end.tv_sec * 1000000 + end.tv_usec)- (start.tv_sec * 1000000 + start.tv_usec);
+  
+  int result = totalTime/iterations;
+	
+    
+
+  printf("%ld\n", totalTime);
 
   return 0;
 }
