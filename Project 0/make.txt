@@ -1,0 +1,2 @@
+make: fork-quiz.c
+     gcc -o make fork-quiz.c -I.
