@@ -4,3 +4,10 @@
 
 //sets the machine to use a single processor
 //calculates the average time of a context switch using a sufficiently large number of samples
+
+#include <stdio.h>
+int main()
+{
+   printf("Hello, World!");
+   return 0;
+}
