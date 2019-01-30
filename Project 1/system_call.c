@@ -13,31 +13,31 @@
 #include <sys/time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "rdtsc.h"
+
 
 int main()
 {
-  int iterations = 1000000;
+	int iterations = 1000000000;
+	long a;
+	long b;
 
-  struct timeval start, end;
+	struct timeval start, end;
+	gettimeofday(&start, NULL);
 
-  gettimeofday(&start, NULL);
-	
-  int i;
-  for (i = 0; i < iterations; i++)
-    {
-    }
+	a = rdtsc();
+	b = rdtsc();
+	gettimeofday(&end, NULL);
 
-  gettimeofday(&end, NULL);
-
-  int totalTime = (end.tv_sec * 1000000 + end.tv_usec)- (start.tv_sec * 1000000 + start.tv_usec);
+	int totalTime = ((b)- (a));
   
-  int result = totalTime/iterations;
+	int result = iterations/totalTime;
 	
     
 
-  printf("%ld\n", totalTime);
+	printf("%ld\n", result);
 
-  return 0;
+	return 0;
 }
 
 
