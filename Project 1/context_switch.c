@@ -12,12 +12,14 @@
 	#include <unistd.h>
 	#include <string.h>
 
-	int main(int argc, char *argv[]){
+	int main(){
 
 		int pipefd[2];
 		pid_t cpid;
 		char buf;
-
+		//string to be printed
+		char* pipeText = "test";
+		
 		//setup timer
 		long iterations = 10;
 		struct timeval start, end;
@@ -27,11 +29,6 @@
 		
 		int i;
 		for(i = 0; i < iterations; i++){
-			if (argc != 2) {
-				fprintf(stderr, "Usage: %s <string>\n", argv[0]);
-				exit(EXIT_FAILURE);
-			}
-
 			if (pipe(pipefd) == -1) {
 				perror("pipe");
 				exit(EXIT_FAILURE);
@@ -55,9 +52,9 @@
 
 			}
 			//stop after child to read timer
-			else{							/* Parent writes argv[1] to pipe */
+			else{							/* Parent writes pipeText to pipe */
 				close(pipefd[0]);			/* Close unused read end */
-				write(pipefd[1], argv[1], strlen(argv[1]));
+				write(pipefd[1], pipeText, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
 				wait(NULL);					/* Wait for child */
 				exit(EXIT_SUCCESS);
