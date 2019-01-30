@@ -7,34 +7,43 @@
 
 
 int main()
-{
-	double iterations = 10;
-	long a;
-	long b;
-
-	struct timeval start, end;
-
+{	
+	//iterations of loop
+	long iterations = 1000000;
+	
+	//data to be read by read()
+	char data[123];
+	
+	//parameters for gettimeofday()
+	struct timeval start, end, mid;
+	
+	//start time
 	gettimeofday(&start, NULL);
-	a = rdtsc();
+	
+	//hold read()
+	int bytes_read;
 
+	//loop for iterations, call read() each time
 	int i;
 	for(i = 0; i < iterations; i++){
+		bytes_read = read(0, data, 0);
 	}
-
-	gettimeofday(&end, NULL);
-	b = rdtsc();
-
-
-	double totalTime1 = ((b)- (a));
-	double totalTime2 = ((end.tv_usec)- (start.tv_usec));
-  
-	double result1 = totalTime1/iterations;
-	double result2 = totalTime2/iterations;
 	
-    
+	//end time 
+	gettimeofday(&end, NULL);
+	
+	//long endResult = end.tv_usec;
+	//long startResult = start.tv_usec;
+	//printf("startResult: %ld\n",startResult);
+	//printf("endResult: %ld\n",endResult);
 
-	printf("result 1: %ld\n", result1);
-	printf("result 2: %ld\n", result2);
+	long totalTime = ((end.tv_usec)- (start.tv_usec));
+	printf("totalTime: %ld\n",totalTime);
+  	
+	// (time in seconds / #iterations)
+	long result = (totalTime*1000)/(iterations);
+
+	printf("result: %ld\n", result);
 
 
 	return 0;
