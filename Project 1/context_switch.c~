@@ -11,14 +11,24 @@
 	#include <stdlib.h>
 	#include <unistd.h>
 	#include <string.h>
+    #include <sched.h>
+    
+	#define _GNU_SOURCE
+	#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
+		                           } while (0)
 
 	int main(){
+		
+		//define # CPU's
+		//cpu_set_t set;
+        //int numCPU = 0;
+		//CPU_ZERO(&set);
 
 		int pipefd[2];
 		pid_t cpid;
 		char buf;
 		//string to be printed
-		char* pipeText = "test1";
+		char* pipeText = "test";
 		
 		//setup timer
 		long iterations = 10;
@@ -35,12 +45,18 @@
 			}
 
 			cpid = fork();
+
 			if (cpid == -1) {
 				perror("fork");
 				exit(EXIT_FAILURE);
 			}
 		
 			if (cpid == 0) {			/* Child reads from pipe */
+				//CPU_SET(numCPU, &set);
+				
+				//if (sched_setaffinity(getpid(), sizeof(set), &set) == -1)
+					//errExit("sched_setaffinity");
+
 				close(pipefd[1]);		/* Close unused write end */
 
 				while (read(pipefd[0], &buf, 1) > 0)
@@ -53,6 +69,10 @@
 			}
 			//stop after child to read timer
 			else{							/* Parent writes pipeText to pipe */
+				//CPU_SET(numCPU, &set);
+				//if (sched_setaffinity(getpid(), sizeof(set), &set) == -1)
+					//errExit("sched_setaffinity");
+				
 				close(pipefd[0]);			/* Close unused read end */
 				write(pipefd[1], pipeText, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
