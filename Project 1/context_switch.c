@@ -12,23 +12,35 @@ using namespace std;
 
 int main()
 {
-    struct timeval t1, t2;
-    double elapsedTime;
-
-    // start timer
-    gettimeofday(&t1, NULL); 
-
-    // do something
-    // ...
-
-    // stop timer
-    gettimeofday(&t2, NULL);
-
-    // compute and print the elapsed time in millisec
-    elapsedTime = (t2.tv_sec - t1.tv_sec) * 1000.0;      // sec to ms
-    elapsedTime += (t2.tv_usec - t1.tv_usec) / 1000.0;   // us to ms
-    cout << elapsedTime << " ms.\n";
-    
-
-    return 0;
+    uint32_t COUNTER;
+	pthread_mutex_t LOCK;
+	pthread_mutex_t START;
+	pthread_cond_t CONDITION;
+	void * threads (void * unused) {
+		pthread_mutex_lock(&START);
+		pthread_mutex_unlock(&START);
+		pthread_mutex_lock(&LOCK);
+		if (COUNTER > 0) {
+			pthread_cond_signal(&CONDITION);
+		}
+		for (;;) {
+			COUNTER++;
+			pthread_cond_wait(&CONDITION, &LOCK);
+			pthread_cond_signal(&CONDITION);
+		}
+		pthread_mutex_unlock(&LOCK);
+	}
+	pthread_mutex_lock(&START);
+    COUNTER = 0;
+    pthread_create(&t1, NULL, threads, NULL);
+    pthread_create(&t2, NULL, threads, NULL);
+    pthread_detach(t1);
+    pthread_detach(t2);
+    myTime = tTimer();
+    pthread_mutex_unlock(&START);
+    sleep(1);
+    // Lock both simulaneous threads
+    pthread_mutex_lock(&LOCK);
+    //Normalize the result in second precision
+    myTime = tTimer() - myTime / 1000;
 }
