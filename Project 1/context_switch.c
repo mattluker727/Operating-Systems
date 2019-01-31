@@ -59,7 +59,7 @@
 			clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
 
 			if (cpid == 0) {			/* Child reads from pipe */
-				//printf("%d\n",sched_getcpu());
+				printf("%d\n",sched_getcpu());
 				close(pipefd[1]);		/* Close unused write end */
 
 				while (read(pipefd[0], &buf, 1) > 0)
@@ -74,13 +74,13 @@
 				//_exit(EXIT_SUCCESS);
 			}
 			else{							/* Parent writes pipeText to pipe */
-				//printf("%d\n",sched_getcpu());
+				printf("%d\n",sched_getcpu());
 				close(pipefd[0]);			/* Close unused read end */
 				write(pipefd[1], pipeText, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
 
 				wait(NULL);					/* Wait for child */
-				
+				//exit(EXIT_SUCCESS);
 			}
 		}
 		
