@@ -64,15 +64,14 @@
 
 				while (read(pipefd[0], &buf, 1) > 0)
 					write(STDOUT_FILENO, &buf, 1);
-					
+
 				//end time
 				clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end); 
 
 				write(STDOUT_FILENO, "\n", 1);
 				close(pipefd[0]);
-				_exit(EXIT_SUCCESS);
+				//_exit(EXIT_SUCCESS);
 			}
-			//stop after child to read timer
 			else{							/* Parent writes pipeText to pipe */
 				//printf("%d\n",sched_getcpu());
 				close(pipefd[0]);			/* Close unused read end */
@@ -81,12 +80,12 @@
 
 				wait(NULL);					/* Wait for child */
 				
-				exit(EXIT_SUCCESS);
+				//exit(EXIT_SUCCESS);
 			}
 		}
-
-		printf(start.tv_nsec + "\n");
-		printf(end.tv_nsec + "\n");
+		
+		printf(start.tv_nsec + "start \n");
+		printf(end.tv_nsec + "end \n");
 		long totalTime = ((end.tv_sec)- (start.tv_sec));
 		printf("totalTime: %ld\n",totalTime);
 
