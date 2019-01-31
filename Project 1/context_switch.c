@@ -64,7 +64,7 @@
 				printf("C: %d\n",sched_getcpu());
 				close(pipefd[1]);		/* Close unused write end */
 
-				read(pipefd[0], &buf, sizeof(buf));
+				read(pipefd[0], buf, sizeof(buf));
 				printf(buf);
 				printf("\n");
 
@@ -73,18 +73,17 @@
 				totalTime += ((end.tv_usec)- (start.tv_usec));
 
 				close(pipefd[0]);
-
-				//write(STDOUT_FILENO, "\n", 1);
-				
+								
 				exit(0);
 			}
 			else{							/* Parent writes pipeText to pipe */
 				printf("P: %d\n",sched_getcpu());
 				close(pipefd[0]);			/* Close unused read end */
-				write(pipefd[1], &buf, strlen(pipeText));
+				write(pipefd[1], buf, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
 
 				wait(NULL);					/* Wait for child */
+				exit(0);
 			}
 		}
 		
