@@ -32,7 +32,7 @@
 		
 		int pipefd[2];
 		pid_t cpid;
-		char buf[15];
+		char buf[5];
 		long totalTime = 0;
 		//string to be printed
 		char pipeText[] = "test";
@@ -74,7 +74,7 @@
 
 				close(pipefd[0]);
 
-				write(STDOUT_FILENO, "\n", 1);
+				//write(STDOUT_FILENO, "\n", 1);
 				
 				printf("test0");
 				exit(0);
@@ -83,7 +83,7 @@
 			else{							/* Parent writes pipeText to pipe */
 				printf("P: %d\n",sched_getcpu());
 				close(pipefd[0]);			/* Close unused read end */
-				write(pipefd[1], pipeText, sizeof(pipeText));
+				write(pipefd[1], pipeText, sizeof(pipeText)+1);
 				close(pipefd[1]);			/* Reader will see EOF */
 
 				printf("test1");
