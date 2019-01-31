@@ -64,7 +64,7 @@
 				printf("C: %d\n",sched_getcpu());
 				close(pipefd[1]);		/* Close unused write end */
 
-				read(pipefd[0], buf, sizeof(buf));
+				read(pipefd[0], buf, 4);
 				printf(buf);
 				printf("\n");
 
