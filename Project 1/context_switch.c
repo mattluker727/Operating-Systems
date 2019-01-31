@@ -23,12 +23,12 @@
 	int main(){
 		
 		//define # CPU's
-		//cpu_set_t cpuset;
-        //int numCPU = 0;
-		//CPU_ZERO(&cpuset);
-		//CPU_SET(numCPU, &cpuset);
+		cpu_set_t cpuset;
+        int numCPU = 0;
+		CPU_ZERO(&cpuset);
+		CPU_SET(numCPU, &cpuset);
 		//restrict current process to 1 CPU
-  		//sched_setaffinity(0, sizeof(cpuset), &cpuset);
+  		sched_setaffinity(0, sizeof(cpuset), &cpuset);
 		
 		int pipefd[2];
 		pid_t cpid;
@@ -61,8 +61,7 @@
 			gettimeofday(&start, NULL);
 
 			if (cpid == 0) {			/* Child reads from pipe */
-				//printf("C: %d\n",sched_getcpu());
-				printf("C: %d\n");
+				printf("C: %d\n",sched_getcpu());
 				close(pipefd[1]);		/* Close unused write end */
 
 				read(pipefd[0], buf, sizeof(buf));
@@ -74,12 +73,11 @@
 				totalTime += ((end.tv_usec)- (start.tv_usec));
 
 				close(pipefd[0]);
-
+				
 				exit(0);
 			}
 			else{							/* Parent writes pipeText to pipe */
-				//printf("P: %d\n",sched_getcpu());
-				printf("P: %d\n");
+				printf("P: %d\n",sched_getcpu());
 				close(pipefd[0]);			/* Close unused read end */
 				write(pipefd[1], pipeText, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
