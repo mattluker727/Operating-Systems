@@ -32,11 +32,13 @@
 		
 		int pipefd[2];
 		pid_t cpid;
-		char buf[5];
-		long totalTime = 0;
-		//string to be printed
+
+		//buffer and string
 		char pipeText[] = "test";
+		char buf[5];
 		
+		long totalTime = 0;
+
 		//setup timer
 		long iterations = 1;
 		struct timeval start, end;
@@ -62,9 +64,7 @@
 				printf("C: %d\n",sched_getcpu());
 				close(pipefd[1]);		/* Close unused write end */
 
-				//while (read(pipefd[0], &buf, 1) > 0)
-				//	write(STDOUT_FILENO, &buf, 1);
-				read(pipefd[0], buf, sizeof(buf));
+				read(pipefd[0], &buf, sizeof(buf));
 				printf(buf);
 				printf("\n");
 
@@ -81,7 +81,7 @@
 			else{							/* Parent writes pipeText to pipe */
 				printf("P: %d\n",sched_getcpu());
 				close(pipefd[0]);			/* Close unused read end */
-				write(pipefd[1], buf, strlen(pipeText));
+				write(pipefd[1], &buf, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
 
 				wait(NULL);					/* Wait for child */
