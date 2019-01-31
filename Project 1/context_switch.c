@@ -5,25 +5,30 @@
 //sets the machine to use a single processor
 //calculates the average time of a context switch using a sufficiently large number of samples
 
+	#define _GNU_SOURCE
 	#include <sys/types.h>
 	#include <sys/wait.h>
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <unistd.h>
 	#include <string.h>
+	
     #include <sched.h>
-    
-	#define _GNU_SOURCE
+    #include <pthread.h>
+
 	#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
 		                           } while (0)
-
+	
 	int main(){
 		
 		//define # CPU's
-		//cpu_set_t set;
-        //int numCPU = 0;
-		//CPU_ZERO(&set);
-
+		cpu_set_t cpuset;
+        int numCPU = 0;
+		CPU_ZERO(&cpuset);
+		CPU_SET(numCPU, &cpuset);
+		//restrict current process to 1 CPU
+  		sched_setaffinity(0, sizeof(cpuset), &cpuset);
+		
 		int pipefd[2];
 		pid_t cpid;
 		char buf;
@@ -33,9 +38,6 @@
 		//setup timer
 		long iterations = 10;
 		struct timeval start, end;
-
-		//start time
-		gettimeofday(&start, NULL);
 		
 		int i;
 		for(i = 0; i < iterations; i++){
@@ -52,11 +54,7 @@
 			}
 		
 			if (cpid == 0) {			/* Child reads from pipe */
-				//CPU_SET(numCPU, &set);
-				
-				//if (sched_setaffinity(getpid(), sizeof(set), &set) == -1)
-					//errExit("sched_setaffinity");
-
+				//printf("%d\n",sched_getcpu());
 				close(pipefd[1]);		/* Close unused write end */
 
 				while (read(pipefd[0], &buf, 1) > 0)
@@ -65,24 +63,22 @@
 				write(STDOUT_FILENO, "\n", 1);
 				close(pipefd[0]);
 				//_exit(EXIT_SUCCESS);
-
 			}
 			//stop after child to read timer
 			else{							/* Parent writes pipeText to pipe */
-				//CPU_SET(numCPU, &set);
-				//if (sched_setaffinity(getpid(), sizeof(set), &set) == -1)
-					//errExit("sched_setaffinity");
-				
+				//printf("%d\n",sched_getcpu());
 				close(pipefd[0]);			/* Close unused read end */
 				write(pipefd[1], pipeText, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
+				
+				//start time
+				gettimeofday(&start, NULL);
 				wait(NULL);					/* Wait for child */
+				//end time 
+				gettimeofday(&end, NULL);
 				exit(EXIT_SUCCESS);
 			}
 		}
-		
-		//end time 
-		gettimeofday(&end, NULL);
 
 		long totalTime = ((end.tv_usec)- (start.tv_usec));
 		printf("totalTime: %ld\n",totalTime);
