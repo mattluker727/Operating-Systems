@@ -70,7 +70,8 @@
 
 				write(STDOUT_FILENO, "\n", 1);
 				close(pipefd[0]);
-				exit(EXIT_SUCCESS);
+				exit(0);
+				//_exit(EXIT_SUCCESS);
 			}
 			else{							/* Parent writes pipeText to pipe */
 				//printf("%d\n",sched_getcpu());
