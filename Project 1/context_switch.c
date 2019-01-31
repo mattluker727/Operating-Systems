@@ -56,7 +56,7 @@
 			perror("fork");
 			exit(EXIT_FAILURE);
 		}
-		
+
 		int i;
 		for(i = 0; i < iterations; i++){
 			if (cpid == 0) {			/* Child reads from pipe */
@@ -68,7 +68,7 @@
 
 				write(STDOUT_FILENO, "\n", 1);
 				close(pipefd[0]);
-				//_exit(EXIT_SUCCESS);
+				_exit(EXIT_SUCCESS);
 			}
 			//stop after child to read timer
 			else{							/* Parent writes pipeText to pipe */
