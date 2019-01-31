@@ -53,12 +53,10 @@
 			exit(EXIT_FAILURE);
 		}
 		
-		gettimeofday(&start, NULL);
-
 		int i;
 		for(i = 0; i < iterations; i++){
 			//start timer
-			//gettimeofday(&start, NULL);
+			gettimeofday(&start, NULL);
 
 			if (cpid == 0) {			/* Child reads from pipe */
 				printf("C: %d\n",sched_getcpu());
@@ -68,8 +66,8 @@
 					write(STDOUT_FILENO, &buf, 1);
 
 				//end time
-				//gettimeofday(&end, NULL);
-				//totalTime += ((end.tv_usec)- (start.tv_usec));
+				gettimeofday(&end, NULL);
+				totalTime += ((end.tv_usec)- (start.tv_usec));
 
 				close(pipefd[0]);
 
@@ -91,9 +89,6 @@
 			printf("test0");
 		}
 		printf("test1");
-
-		gettimeofday(&end, NULL);
-		totalTime += ((end.tv_usec)- (start.tv_usec));
 		
 		printf(start.tv_usec + "start \n");
 		printf(end.tv_usec + "end \n");
