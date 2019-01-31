@@ -16,7 +16,7 @@
 	
     #include <sched.h>
     #include <pthread.h>
-
+	
 	#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
 		                           } while (0)
 	
@@ -36,7 +36,8 @@
 		//buffer and string
 		char pipeText[] = "test";
 		char buf[5];
-		
+	
+		int status;
 		long totalTime = 0;
 
 		//setup timer
@@ -61,20 +62,25 @@
 			gettimeofday(&start, NULL);
 
 			if (cpid == 0) {			/* Child reads from pipe */
-				printf("C: %d\n",sched_getcpu());
+				//check affinity
+				if (sched_setaffinity(getpid(), sizeof(cpuset), &cpuset) == -1)
+					errExit("sched_setaffinity");
+
+				//printf("C: %d\n",sched_getcpu());
 				close(pipefd[1]);		/* Close unused write end */
 				
 				//while (read(pipefd[0], &buf, 1) > 0)
                 //   write(STDOUT_FILENO, &buf, 1);
 				//write(STDOUT_FILENO, "\n", 1);
 				
-				read(pipefd[0], buf, sizeof(buf));
+				read(pipefd[0], buf, sizeof(buf)+1);
 				printf(buf);
 				printf("\n");
 
 				//end time
 				gettimeofday(&end, NULL);
 				totalTime += ((end.tv_usec)- (start.tv_usec));
+				printf("%d\n",totalTime);
 
 				close(pipefd[0]);
 
@@ -82,24 +88,29 @@
 				//exit(0);
 			}
 			else{							/* Parent writes pipeText to pipe */
-				printf("P: %d\n",sched_getcpu());
+				//check affinity
+				if (sched_setaffinity(getpid(), sizeof(cpuset), &cpuset) == -1)
+					errExit("sched_setaffinity");
+				//printf("P: %d\n",sched_getcpu());
 				close(pipefd[0]);			/* Close unused read end */
 				write(pipefd[1], pipeText, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
 
-				wait(NULL);					/* Wait for child */
+				waitpid(cpid, &status, -1);
+				//wait(NULL);					/* Wait for child */
 				//exit(0);
 			}
 		}
-		
-		//printf(start.tv_usec + "start \n");
-		//printf(end.tv_usec + "end \n");
-		printf("totalTime: %ld\n",totalTime);
+		if (cpid == 0){
+			//printf(start.tv_usec + "start \n");
+			//printf(end.tv_usec + "end \n");
+			printf("totalTime: %ld\n",totalTime);
 
-		// (time in seconds / #iterations)
-		long result = (totalTime)/(iterations);
+			// (time in seconds / #iterations)
+			long result = (totalTime)/(iterations);
 
-		printf("result: %ld\n", result);
+			printf("result: %ld\n", result);
+		}
 
 		return 0;
 	}
