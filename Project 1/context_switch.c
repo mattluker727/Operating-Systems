@@ -79,7 +79,7 @@
 				write(pipefd[1], pipeText, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
 
-				wait(NULL);					/* Wait for child */
+				//wait(NULL);					/* Wait for child */
 				//exit(EXIT_SUCCESS);
 			}
 		}
