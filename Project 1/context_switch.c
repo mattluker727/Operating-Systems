@@ -86,9 +86,9 @@
 				//exit(EXIT_SUCCESS);
 				//exit(0);
 			}
-			printf("test");
+			printf("test0");
 		}
-		printf("test");
+		printf("test1");
 		
 		printf(start.tv_usec + "start \n");
 		printf(end.tv_usec + "end \n");
