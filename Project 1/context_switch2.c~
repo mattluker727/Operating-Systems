@@ -13,7 +13,7 @@
 	#include <unistd.h>
 	#include <string.h>
 	#include <time.h>
-	
+
     #include <sched.h>
     #include <pthread.h>
 
@@ -34,15 +34,15 @@
 		pid_t cpid;
 		
 		//buffer and string
-		char pipeText[] = "test";
-		char buf[5];
-		
-		long totalTime = 0;
+		char* pipeText = "test";
+		char buf;
 
+		long totalTime = 0;
+		
 		//setup timer
 		long iterations = 10;
 		struct timeval start, end;
-
+		
 		if (pipe(pipefd) == -1) {
 			perror("pipe");
 			exit(EXIT_FAILURE);
@@ -54,38 +54,39 @@
 			perror("fork");
 			exit(EXIT_FAILURE);
 		}
-		
+			
 		int i;
 		for(i = 0; i < iterations; i++){
-			//start timer
+			//start time
 			gettimeofday(&start, NULL);
 
 			if (cpid == 0) {			/* Child reads from pipe */
 				printf("C: %d\n",sched_getcpu());
 				close(pipefd[1]);		/* Close unused write end */
-				
+
 				while (read(pipefd[0], &buf, 1) > 0)
-                   write(STDOUT_FILENO, &buf, 1);
+					write(STDOUT_FILENO, &buf, 1);
 				//read(pipefd[0], buf, sizeof(buf));
 				//printf(buf);
 				//printf("\n");
 
-				//end time
+				//end time 
 				gettimeofday(&end, NULL);
 				totalTime += ((end.tv_usec)- (start.tv_usec));
 
 				close(pipefd[0]);
 
-				break(0);
-				//exit(0);
+				exit(0);
 			}
+			//stop after child to read timer
 			else{							/* Parent writes pipeText to pipe */
 				printf("P: %d\n",sched_getcpu());
 				close(pipefd[0]);			/* Close unused read end */
 				write(pipefd[1], pipeText, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
-
+				
 				wait(NULL);					/* Wait for child */
+			
 				//exit(0);
 			}
 		}
@@ -95,7 +96,7 @@
 		printf("totalTime: %ld\n",totalTime);
 
 		// (time in seconds / #iterations)
-		long result = (totalTime)/(iterations);
+		long result = (totalTime*1000)/(iterations);
 
 		printf("result: %ld\n", result);
 

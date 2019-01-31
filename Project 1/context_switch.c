@@ -32,7 +32,7 @@
 		
 		int pipefd[2];
 		pid_t cpid;
-
+		
 		//buffer and string
 		char pipeText[] = "test";
 		char buf[5];
@@ -40,7 +40,7 @@
 		long totalTime = 0;
 
 		//setup timer
-		long iterations = 1;
+		long iterations = 10;
 		struct timeval start, end;
 
 		if (pipe(pipefd) == -1) {
@@ -63,18 +63,21 @@
 			if (cpid == 0) {			/* Child reads from pipe */
 				printf("C: %d\n",sched_getcpu());
 				close(pipefd[1]);		/* Close unused write end */
-
-				read(pipefd[0], buf, sizeof(buf));
-				printf(buf);
-				printf("\n");
+				
+				while (read(pipefd[0], &buf, 1) > 0)
+                   write(STDOUT_FILENO, &buf, 1);
+				//read(pipefd[0], buf, sizeof(buf));
+				//printf(buf);
+				//printf("\n");
 
 				//end time
 				gettimeofday(&end, NULL);
 				totalTime += ((end.tv_usec)- (start.tv_usec));
 
 				close(pipefd[0]);
-				
-				exit(0);
+
+				break;
+				//exit(0);
 			}
 			else{							/* Parent writes pipeText to pipe */
 				printf("P: %d\n",sched_getcpu());
@@ -87,8 +90,8 @@
 			}
 		}
 		
-		printf(start.tv_usec + "start \n");
-		printf(end.tv_usec + "end \n");
+		//printf(start.tv_usec + "start \n");
+		//printf(end.tv_usec + "end \n");
 		printf("totalTime: %ld\n",totalTime);
 
 		// (time in seconds / #iterations)
