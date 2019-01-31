@@ -32,10 +32,10 @@
 		
 		int pipefd[2];
 		pid_t cpid;
-		char buf;
+		char buf[15];
 		long totalTime = 0;
 		//string to be printed
-		char pipeText = "t";
+		char pipeText[] = "test";
 		
 		//setup timer
 		long iterations = 1;
@@ -62,8 +62,10 @@
 				printf("C: %d\n",sched_getcpu());
 				close(pipefd[1]);		/* Close unused write end */
 
-				while (read(pipefd[0], &buf, 1) > 0)
-					write(STDOUT_FILENO, &buf, 1);
+				//while (read(pipefd[0], &buf, 1) > 0)
+				//	write(STDOUT_FILENO, &buf, 1);
+				read(pipefd[0], &buf, sizeof(pipeText));
+				printf(buf);
 
 				//end time
 				gettimeofday(&end, NULL);
@@ -80,7 +82,7 @@
 			else{							/* Parent writes pipeText to pipe */
 				printf("P: %d\n",sched_getcpu());
 				close(pipefd[0]);			/* Close unused read end */
-				write(pipefd[1], pipeText, 1);
+				write(pipefd[1], pipeText, sizeof(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
 
 				printf("test1");
