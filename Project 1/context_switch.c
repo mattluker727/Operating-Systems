@@ -12,6 +12,7 @@
 	#include <stdlib.h>
 	#include <unistd.h>
 	#include <string.h>
+	#include <time.h>
 	
     #include <sched.h>
     #include <pthread.h>
@@ -37,9 +38,11 @@
 		
 		//setup timer
 		long iterations = 10;
-		struct timeval start, end;
-		
+		//struct timeval start, end;
+		struct timespec start, end;		
+
 		int i;
+		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
 		for(i = 0; i < iterations; i++){
 			if (pipe(pipefd) == -1) {
 				perror("pipe");
@@ -71,20 +74,23 @@
 				write(pipefd[1], pipeText, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
 				
-				//start time
-				gettimeofday(&start, NULL);
+			
+				
 				wait(NULL);					/* Wait for child */
-				//end time 
-				gettimeofday(&end, NULL);
+				
+				
 				exit(EXIT_SUCCESS);
 			}
 		}
-
-		long totalTime = ((end.tv_usec)- (start.tv_usec));
+		sleep(4);
+		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end); 
+		printf(start.tv_nsec + "\n");
+		printf(end.tv_nsec + "\n");
+		long totalTime = ((end.tv_sec)- (start.tv_sec));
 		printf("totalTime: %ld\n",totalTime);
 
 		// (time in seconds / #iterations)
-		long result = (totalTime*1000)/(iterations);
+		long result = (totalTime);
 
 		printf("result: %ld\n", result);
 
