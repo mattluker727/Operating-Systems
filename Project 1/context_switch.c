@@ -65,7 +65,8 @@
 				//while (read(pipefd[0], &buf, 1) > 0)
 				//	write(STDOUT_FILENO, &buf, 1);
 				read(pipefd[0], &buf, sizeof(buf));
-				printf(buf + "\n");
+				printf(buf);
+				printf("\n");
 
 				//end time
 				gettimeofday(&end, NULL);
