@@ -44,7 +44,7 @@ int main()
 	long result = (totalTime*1000)/(iterations);
 
 	printf("result: %ld\n", result);
-
+	//(:)
 
 	return 0;
 }
