@@ -73,6 +73,7 @@
 
 				write(STDOUT_FILENO, "\n", 1);
 				
+				printf("test0");
 				exit(0);
 				//_exit(EXIT_SUCCESS);
 			}
@@ -86,9 +87,9 @@
 				//exit(EXIT_SUCCESS);
 				//exit(0);
 			}
-			printf("test0");
+			printf("test1");
 		}
-		printf("test1");
+		printf("test2");
 		
 		printf(start.tv_usec + "start \n");
 		printf(end.tv_usec + "end \n");
