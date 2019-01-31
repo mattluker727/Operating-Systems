@@ -35,7 +35,7 @@
 		char buf;
 		long totalTime = 0;
 		//string to be printed
-		char* pipeText = "test";
+		char pipeText = "t";
 		
 		//setup timer
 		long iterations = 1;
@@ -74,7 +74,7 @@
 				write(STDOUT_FILENO, "\n", 1);
 				
 				printf("test0");
-				//exit(0);
+				exit(0);
 				//_exit(EXIT_SUCCESS);
 			}
 			else{							/* Parent writes pipeText to pipe */
