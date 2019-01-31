@@ -38,7 +38,7 @@
 		char* pipeText = "test";
 		
 		//setup timer
-		long iterations = 10;
+		long iterations = 1;
 		struct timeval start, end;
 
 		if (pipe(pipefd) == -1) {
