@@ -33,6 +33,7 @@
 		int pipefd[2];
 		pid_t cpid;
 		char buf;
+		long totalTime;
 		//string to be printed
 		char* pipeText = "test";
 		
@@ -51,7 +52,7 @@
 			perror("fork");
 			exit(EXIT_FAILURE);
 		}
-
+		
 		int i;
 		for(i = 0; i < iterations; i++){
 			//start timer
@@ -66,6 +67,7 @@
 
 				//end time
 				gettimeofday(&end, NULL);
+				totalTime += ((end.tv_usec)- (start.tv_usec));
 
 				close(pipefd[0]);
 
@@ -87,7 +89,6 @@
 		
 		printf(start.tv_usec + "start \n");
 		printf(end.tv_usec + "end \n");
-		long totalTime = ((end.tv_usec)- (start.tv_usec));
 		printf("totalTime: %ld\n",totalTime);
 
 		// (time in seconds / #iterations)
