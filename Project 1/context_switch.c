@@ -84,12 +84,13 @@
 				close(pipefd[1]);			/* Reader will see EOF */
 
 				wait(NULL);					/* Wait for child */
+				printf("test1");
 				//exit(EXIT_SUCCESS);
 				//exit(0);
 			}
-			printf("test1");
+			printf("test2");
 		}
-		printf("test2");
+		printf("test3");
 		
 		printf(start.tv_usec + "start \n");
 		printf(end.tv_usec + "end \n");
