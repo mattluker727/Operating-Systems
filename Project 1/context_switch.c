@@ -39,7 +39,7 @@
 		//setup timer
 		long iterations = 10;
 		struct timeval start, end;
-		
+
 		if (pipe(pipefd) == -1) {
 			perror("pipe");
 			exit(EXIT_FAILURE);
@@ -85,8 +85,8 @@
 			}
 		}
 		
-		printf(start.tv_nsec + "start \n");
-		printf(end.tv_nsec + "end \n");
+		printf(start.tv_usec + "start \n");
+		printf(end.tv_usec + "end \n");
 		long totalTime = ((end.tv_usec)- (start.tv_usec));
 		printf("totalTime: %ld\n",totalTime);
 
