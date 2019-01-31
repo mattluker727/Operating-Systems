@@ -35,7 +35,7 @@
 		char buf;
 		long totalTime = 0;
 		//string to be printed
-		char pipeText = "t";
+		char* pipeText = 't';
 		
 		//setup timer
 		long iterations = 1;
