@@ -38,9 +38,8 @@
 		
 		//setup timer
 		long iterations = 10;
-		//struct timeval start, end;
-		struct timespec start, end;		
-
+		struct timeval start, end;
+		
 		if (pipe(pipefd) == -1) {
 			perror("pipe");
 			exit(EXIT_FAILURE);
@@ -56,7 +55,7 @@
 		int i;
 		for(i = 0; i < iterations; i++){
 			//start timer
-			clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+			gettimeofday(&start, NULL);
 
 			if (cpid == 0) {			/* Child reads from pipe */
 				printf("C: %d\n",sched_getcpu());
@@ -66,10 +65,12 @@
 					write(STDOUT_FILENO, &buf, 1);
 
 				//end time
-				clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end); 
+				gettimeofday(&end, NULL);
+
+				close(pipefd[0]);
 
 				write(STDOUT_FILENO, "\n", 1);
-				close(pipefd[0]);
+				
 				exit(0);
 				//_exit(EXIT_SUCCESS);
 			}
@@ -79,18 +80,18 @@
 				write(pipefd[1], pipeText, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
 
-				//wait(NULL);					/* Wait for child */
+				wait(NULL);					/* Wait for child */
 				//exit(EXIT_SUCCESS);
 			}
 		}
 		
 		printf(start.tv_nsec + "start \n");
 		printf(end.tv_nsec + "end \n");
-		long totalTime = ((end.tv_sec)- (start.tv_sec));
+		long totalTime = ((end.tv_usec)- (start.tv_usec));
 		printf("totalTime: %ld\n",totalTime);
 
 		// (time in seconds / #iterations)
-		long result = (totalTime);
+		long result = (totalTime)/(iterations);
 
 		printf("result: %ld\n", result);
 
