@@ -64,11 +64,13 @@
 				printf("C: %d\n",sched_getcpu());
 				close(pipefd[1]);		/* Close unused write end */
 				
-				while (read(pipefd[0], &buf, 1) > 0)
-                   write(STDOUT_FILENO, &buf, 1);
-				//read(pipefd[0], buf, sizeof(buf));
-				//printf(buf);
-				//printf("\n");
+				//while (read(pipefd[0], &buf, 1) > 0)
+                //   write(STDOUT_FILENO, &buf, 1);
+				//write(STDOUT_FILENO, "\n", 1);
+				
+				read(pipefd[0], buf, sizeof(buf));
+				printf(buf);
+				printf("\n");
 
 				//end time
 				gettimeofday(&end, NULL);
@@ -76,7 +78,7 @@
 
 				close(pipefd[0]);
 
-				break(0);
+				//break;
 				//exit(0);
 			}
 			else{							/* Parent writes pipeText to pipe */
