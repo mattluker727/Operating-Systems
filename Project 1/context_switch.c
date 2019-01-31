@@ -78,7 +78,7 @@
 				
 				printf("test0");
 				//exit(0);
-				_exit(EXIT_SUCCESS);
+				//_exit(EXIT_SUCCESS);
 			}
 			else{							/* Parent writes pipeText to pipe */
 				printf("P: %d\n",sched_getcpu());
