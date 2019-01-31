@@ -76,23 +76,17 @@
 
 				//write(STDOUT_FILENO, "\n", 1);
 				
-				printf("test0");
-				//exit(0);
-				//_exit(EXIT_SUCCESS);
+				exit(0);
 			}
 			else{							/* Parent writes pipeText to pipe */
 				printf("P: %d\n",sched_getcpu());
 				close(pipefd[0]);			/* Close unused read end */
-				write(pipefd[1], pipeText, strlen(pipeText));
+				write(pipefd[1], buf, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
 
-				printf("test1");
 				wait(NULL);					/* Wait for child */
-				printf("test2");
 			}
-			printf("test3");
 		}
-		printf("test4");
 		
 		printf(start.tv_usec + "start \n");
 		printf(end.tv_usec + "end \n");
