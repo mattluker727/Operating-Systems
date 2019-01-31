@@ -40,22 +40,25 @@
 		long iterations = 10;
 		//struct timeval start, end;
 		struct timespec start, end;		
-
-		int i;
-		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
-		for(i = 0; i < iterations; i++){
-			if (pipe(pipefd) == -1) {
-				perror("pipe");
-				exit(EXIT_FAILURE);
-			}
-
-			cpid = fork();
-
-			if (cpid == -1) {
-				perror("fork");
-				exit(EXIT_FAILURE);
-			}
 		
+		//start time
+		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+
+		
+		if (pipe(pipefd) == -1) {
+			perror("pipe");
+			exit(EXIT_FAILURE);
+		}
+
+		cpid = fork();
+
+		if (cpid == -1) {
+			perror("fork");
+			exit(EXIT_FAILURE);
+		}
+		
+		int i;
+		for(i = 0; i < iterations; i++){
 			if (cpid == 0) {			/* Child reads from pipe */
 				//printf("%d\n",sched_getcpu());
 				close(pipefd[1]);		/* Close unused write end */
@@ -79,8 +82,10 @@
 				exit(EXIT_SUCCESS);
 			}
 		}
-		
+
+		//end time
 		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end); 
+
 		printf(start.tv_nsec + "\n");
 		printf(end.tv_nsec + "\n");
 		long totalTime = ((end.tv_sec)- (start.tv_sec));
