@@ -81,7 +81,7 @@
 				close(pipefd[1]);			/* Reader will see EOF */
 
 				wait(NULL);					/* Wait for child */
-				exit(EXIT_SUCCESS);
+				//exit(EXIT_SUCCESS);
 			}
 		}
 		
