@@ -73,7 +73,7 @@
 
 				write(STDOUT_FILENO, "\n", 1);
 				
-				///exit(0);
+				//exit(0);
 				_exit(EXIT_SUCCESS);
 			}
 			else{							/* Parent writes pipeText to pipe */
@@ -83,7 +83,7 @@
 				close(pipefd[1]);			/* Reader will see EOF */
 
 				wait(NULL);					/* Wait for child */
-				//exit(EXIT_SUCCESS);
+				exit(EXIT_SUCCESS);
 			}
 		}
 		
