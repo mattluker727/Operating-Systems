@@ -33,7 +33,7 @@
 		int pipefd[2];
 		pid_t cpid;
 		char buf;
-		long totalTime;
+		long totalTime = 0;
 		//string to be printed
 		char* pipeText = "test";
 		
