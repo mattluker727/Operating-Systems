@@ -73,16 +73,13 @@
 				close(pipefd[0]);			/* Close unused read end */
 				write(pipefd[1], pipeText, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
-				
-			
-				
+
 				wait(NULL);					/* Wait for child */
-				
 				
 				exit(EXIT_SUCCESS);
 			}
 		}
-		sleep(4);
+		
 		clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end); 
 		printf(start.tv_nsec + "\n");
 		printf(end.tv_nsec + "\n");
