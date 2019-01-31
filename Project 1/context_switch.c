@@ -74,7 +74,7 @@
 				write(STDOUT_FILENO, "\n", 1);
 				
 				printf("test0");
-				exit(0);
+				//exit(0);
 				//_exit(EXIT_SUCCESS);
 			}
 			else{							/* Parent writes pipeText to pipe */
