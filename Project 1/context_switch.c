@@ -83,14 +83,15 @@
 				write(pipefd[1], pipeText, strlen(pipeText));
 				close(pipefd[1]);			/* Reader will see EOF */
 
-				wait(NULL);					/* Wait for child */
 				printf("test1");
+				wait(NULL);					/* Wait for child */
+				printf("test2");
 				//exit(EXIT_SUCCESS);
 				//exit(0);
 			}
-			printf("test2");
+			printf("test3");
 		}
-		printf("test3");
+		printf("test4");
 		
 		printf(start.tv_usec + "start \n");
 		printf(end.tv_usec + "end \n");
