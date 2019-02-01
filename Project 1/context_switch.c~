@@ -41,7 +41,7 @@
 		long totalTime = 0;
 
 		//setup timer
-		long iterations = 1000;
+		long iterations = 100000;
 		struct timeval start, end;
 
 		if (pipe(pipefd) == -1) {

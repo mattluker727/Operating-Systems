@@ -9,7 +9,7 @@
 int main()
 {
 	//iterations of loop
-	float iterations = 100000;
+	float iterations = 10;
 
 	//data to be read by read()
 	char data[1];
