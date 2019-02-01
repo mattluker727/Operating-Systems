@@ -9,7 +9,7 @@
 int main()
 {
 	//iterations of loop
-	float iterations = 1000000;
+	float iterations = 10;
 
 	//data to be read by read()
 	char data[1];
@@ -41,7 +41,7 @@ int main()
 	long totalTime = (end.tv_usec-start.tv_usec);
 	float totalSec = (float)totalTime/1000000;
 	//printf("totalTime: %.5f\n",totalTime);
-	printf("number of iterations: %ld\n", iterations);
+	printf("number of iterations: %ld\n", (long)iterations);
 	printf("totalTime: (sec) %.9f\n", totalSec);
 	// (time in seconds / #iterations)
 	float result = totalSec /(iterations);
