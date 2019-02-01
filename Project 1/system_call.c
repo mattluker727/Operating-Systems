@@ -42,7 +42,7 @@ int main()
 	printf("totalTime: %ld\n",totalTime);
 
 	// (time in seconds / #iterations)
-	float result = (totalTime*1000)/(iterations);
+	float result = (totalTime/6)/(iterations);
 
 	printf("result: %ld\n", result);
 

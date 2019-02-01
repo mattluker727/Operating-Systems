@@ -72,16 +72,12 @@
 				
 					//printf("C: %d\n",sched_getcpu());
 					close(pipefd[1]);					//Close write end
-				
-					//while (read(pipefd[0], &buf, 1) > 0)
-		            //   write(STDOUT_FILENO, &buf, 1);
-					//write(STDOUT_FILENO, "\n", 1);
-				
+					
 					read(pipefd[0], buf, sizeof(buf));	//Read from pipe
 					//Print from pipe (buffer)
 					//printf(buf);
 					//printf("\n");
-				
+
 					//end time
 					gettimeofday(&end, NULL);
 					totalTime += ((end.tv_usec)- (start.tv_usec));
@@ -99,9 +95,9 @@
 					close(pipefd[0]);								//Close read end
 					write(pipefd[1], pipeText, strlen(pipeText));	//Write to pipe
 					close(pipefd[1]);								//Close write end
-				
-					waitpid(cpid, &status, -1);						//Wait for child
-					//wait(NULL);
+					
+					//waitpid(cpid, &status, 1);						//Wait for child
+					wait(NULL);
 				}
 			}
 		}
@@ -110,10 +106,14 @@
 		if (cpid == 0){
 			//printf("%d\n",start.tv_usec);
 			//printf("%d\n",end.tv_usec);
-			printf("totalTime: %ld\n",totalTime);
+			//print time in microseconds
+			//printf("totalTime (micro sec): %ld\n",(totalTime));
 			
-			long result = (totalTime)/(iterations);
-			printf("result: %ld\n", result);
+			float totalsSecs = (float)totalTime/100000;
+			printf("totalTime (sec): %.5f\n", totalsSecs);
+			
+			float result = totalsSecs/iterations;
+			printf("Seconds per Iteration: %.5f\n", result);
 		}
 		return 0;
 	}
