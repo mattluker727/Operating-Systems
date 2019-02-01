@@ -41,7 +41,7 @@
 		long totalTime = 0;
 
 		//setup timer
-		long iterations = 10;
+		long iterations = 1000000;
 		struct timeval start, end;
 
 		if (pipe(pipefd) == -1) {
@@ -69,8 +69,6 @@
 			else{
 				//Child will read from pipe
 				if (cpid == 0) {
-				
-					//printf("C: %d\n",sched_getcpu());
 					close(pipefd[1]);					//Close write end
 					
 					read(pipefd[0], buf, sizeof(buf));	//Read from pipe
@@ -80,40 +78,35 @@
 
 					//end time
 					gettimeofday(&end, NULL);
+					//update total time
 					totalTime += ((end.tv_usec)- (start.tv_usec));
-					//check current time total
-					//printf("%d\n",totalTime);
-
+					
 					close(pipefd[0]);
-
-					//break;
-					//exit(0);
 				}
 				//Parent will write to pipe
 				else{
-					//printf("P: %d\n",sched_getcpu());
 					close(pipefd[0]);								//Close read end
 					write(pipefd[1], pipeText, strlen(pipeText));	//Write to pipe
 					close(pipefd[1]);								//Close write end
 					
 					//waitpid(cpid, &status, 1);						//Wait for child
-					wait(NULL);
+					wait(NULL);										//Wait for child
 				}
 			}
 		}
 		
 		//Print result of gettimeofday
 		if (cpid == 0){
-			//printf("%d\n",start.tv_usec);
-			//printf("%d\n",end.tv_usec);
-			//print time in microseconds
-			//printf("totalTime (micro sec): %ld\n",(totalTime));
+			//Print time in microseconds
+			printf("totalTime (micro sec): %ld\n",(totalTime));
 			
-			float totalsSecs = (float)totalTime/100000;
-			printf("totalTime (sec): %.5f\n", totalsSecs);
+			//Print time in seconds
+			float totalsSecs = (float)totalTime/1000000;
+			printf("totalTime (sec): %.6f\n", totalsSecs);
 			
+			//Print seconds per iteration
 			float result = totalsSecs/iterations;
-			printf("Seconds per Iteration: %.5f\n", result);
+			printf("Seconds per Iteration: %.6f\n", result);
 		}
 		return 0;
 	}
