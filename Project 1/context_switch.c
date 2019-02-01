@@ -41,7 +41,7 @@
 		long totalTime = 0;
 
 		//setup timer
-		long iterations = 1000;
+		long iterations = 10;
 		struct timeval start, end;
 
 		if (pipe(pipefd) == -1) {
@@ -61,47 +61,48 @@
 		for(i = 0; i < iterations; i++){
 			//start timer
 			gettimeofday(&start, NULL);
-
-			//Child will read from pipe
-			if (cpid == 0) {
-				//check affinity
-				if (sched_setaffinity(getpid(), sizeof(cpuset), &cpuset) == -1)
-					errExit("sched_setaffinity");
-				
-				//printf("C: %d\n",sched_getcpu());
-				close(pipefd[1]);					//Close write end
-				
-				//while (read(pipefd[0], &buf, 1) > 0)
-                //   write(STDOUT_FILENO, &buf, 1);
-				//write(STDOUT_FILENO, "\n", 1);
-				
-				read(pipefd[0], buf, sizeof(buf));	//Read from pipe
-				//Print from pipe (buffer)
-				printf(buf);
-				printf("\n");
-				
-				//end time
-				gettimeofday(&end, NULL);
-				totalTime += ((end.tv_usec)- (start.tv_usec));
-				//check current time total
-				//printf("%d\n",totalTime);
-
-				close(pipefd[0]);
-
-				//break;
-				//exit(0);
+			
+			//check affinity
+			if (sched_setaffinity(getpid(), sizeof(cpuset), &cpuset) == -1){
+				errExit("sched_setaffinity");
 			}
-			//Parent will write to pipe
 			else{
-				//check affinity
-				if (sched_setaffinity(getpid(), sizeof(cpuset), &cpuset) == -1)
-					errExit("sched_setaffinity");
-				//printf("P: %d\n",sched_getcpu());
-				close(pipefd[0]);								//Close read end
-				write(pipefd[1], pipeText, strlen(pipeText));	//Write to pipe
-				close(pipefd[1]);								//Close write end
+				//Child will read from pipe
+				if (cpid == 0) {
 				
-				waitpid(cpid, &status, -1);						//Wait for child
+					//printf("C: %d\n",sched_getcpu());
+					close(pipefd[1]);					//Close write end
+				
+					//while (read(pipefd[0], &buf, 1) > 0)
+		            //   write(STDOUT_FILENO, &buf, 1);
+					//write(STDOUT_FILENO, "\n", 1);
+				
+					read(pipefd[0], buf, sizeof(buf));	//Read from pipe
+					//Print from pipe (buffer)
+					//printf(buf);
+					//printf("\n");
+				
+					//end time
+					gettimeofday(&end, NULL);
+					totalTime += ((end.tv_usec)- (start.tv_usec));
+					//check current time total
+					//printf("%d\n",totalTime);
+
+					close(pipefd[0]);
+
+					//break;
+					//exit(0);
+				}
+				//Parent will write to pipe
+				else{
+					//printf("P: %d\n",sched_getcpu());
+					close(pipefd[0]);								//Close read end
+					write(pipefd[1], pipeText, strlen(pipeText));	//Write to pipe
+					close(pipefd[1]);								//Close write end
+				
+					waitpid(cpid, &status, -1);						//Wait for child
+					//wait(NULL);
+				}
 			}
 		}
 		

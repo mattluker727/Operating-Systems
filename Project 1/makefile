@@ -1,0 +1,3 @@
+make:
+	gcc -o sc system_call.c
+	gcc -o cs context_switch.c
