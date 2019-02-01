@@ -9,13 +9,13 @@
 int main()
 {
 	//iterations of loop
-	long iterations = 10;
+	float iterations = 100000000;
 
 	//data to be read by read()
 	char data[1];
 
 	//parameters for gettimeofday()
-	struct timeval start, end, mid;
+	struct timeval start, end;
 
 	//start time
 	gettimeofday(&start, NULL);
@@ -33,23 +33,23 @@ int main()
 	//end time 
 	gettimeofday(&end, NULL);
 
-	//long endResult = end.tv_usec;
-	//long startResult = start.tv_usec;
-	//printf("startResult: %ld\n",startResult);
-	//printf("endResult: %ld\n",endResult);
+	//float endResult = end.tv_usec;
+	//float startResult = start.tv_usec;
+	//printf("startResult: %.5f\n",startResult);
+	//printf("endResult: %.5f\n",endResult);
 
-	float totalTime = ((end.tv_usec)-(start.tv_usec));
-	printf("totalTime: %ld\n",totalTime);
-
+	long totalTime = (end.tv_usec-start.tv_usec);
+	float totalSec = (float)totalTime/1000000;
+	//printf("totalTime: %.5f\n",totalTime);
+	printf("totalTime: (sec) %.9f\n", totalSec);
 	// (time in seconds / #iterations)
-	float result = (totalTime/6)/(iterations);
+	float result = totalSec /(iterations);
 
-	printf("result: %ld\n", result);
+	printf("Seconds per Iteration: %.9f\n", result);
 
 
 	return 0;
 }
-
 
 
 
