@@ -98,7 +98,7 @@
 		//Print result of gettimeofday
 		if (cpid == 0){
 
-printf("number of iterations: %ld\n", iterations);
+			printf("number of iterations: %ld\n", iterations);
 			//Print time in microseconds
 			printf("totalTime (micro sec): %ld\n",(totalTime));
 			
