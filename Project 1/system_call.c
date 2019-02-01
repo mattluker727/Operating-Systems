@@ -41,6 +41,7 @@ int main()
 	long totalTime = (end.tv_usec-start.tv_usec);
 	float totalSec = (float)totalTime/1000000;
 	//printf("totalTime: %.5f\n",totalTime);
+	printf("number of iterations: %ld\n", iterations);
 	printf("totalTime: (sec) %.9f\n", totalSec);
 	// (time in seconds / #iterations)
 	float result = totalSec /(iterations);
