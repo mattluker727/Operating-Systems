@@ -74,14 +74,14 @@
 		}	
 		
 		//Load input from given
-		char addr[9];
-		char rw;
-		FILE *fp;
+		//char addr[9];
+		//char rw;
+		//FILE *fp;
 		
-		fp = fopen (file, "w+");
-		fscanf(file, "%s %c", addr, &rw);
+		//fp = fopen (file, "w+");
+		//fscanf(file, "%s %c", addr, &rw);
 		
-		printf("%s", addr);
+		//printf("%s", addr);
 		
 		//Choose algorihm based on user input
 		if (algo = "lru"){

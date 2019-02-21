@@ -76,7 +76,7 @@
 		//Load input from given
 		char addr[9];
 		char rw;
-		FILE fp;
+		FILE *fp;
 		
 		fp = fopen (file, "w+");
 		fscanf(file, "%s %c", addr, &rw);
