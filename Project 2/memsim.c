@@ -73,15 +73,45 @@
 			printf("Incorrect number of args\n");		
 		}	
 		
-		//Load input from given
-		//char addr[9];
-		//char rw;
-		//FILE *fp;
-		
-		//fp = fopen (file, "w+");
-		//fscanf(file, "%s %c", addr, &rw);
-		
-		//printf("%s", addr);
+		//DANCODE START HERE
+
+
+		char addr[7], rw;
+	
+
+		FILE *fp;
+
+		fp = fopen(file, "r");
+	
+		if(fp == NULL){
+			printf("error");
+			exit(1);
+		}
+		char buffer[100000];
+		int fileSize = 0;
+		while(fgets(buffer, sizeof(buffer), fp) != NULL){
+			fileSize++;
+		}
+
+		char holdAddr[fileSize][10];
+		char holdRead[fileSize][1];
+		int i =0;
+
+		while(fscanf(fp, "%s %c", addr, &rw) != EOF){
+
+			strcpy(holdAddr[i], addr);
+			i++;
+		}
+		int j;
+		for(j = 0; j < i; j++){
+			printf(holdAddr[j]);
+			printf("\n");
+		}
+
+		fclose(fp);
+
+
+		//DANCODE END HERE
 		
 		//Choose algorihm based on user input
 		if (algo = "lru"){
