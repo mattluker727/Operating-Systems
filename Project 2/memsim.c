@@ -1,27 +1,50 @@
-// context_swtich.c -  measures the time of a context switch
-
-//forces a context switch using pipes or some other valid method
-
-//sets the machine to use a single processor
-//calculates the average time of a context switch using a sufficiently large number of samples
-	
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
 	#include <stdbool.h>
 	
-	bool isNumber(char number[]);
+	//Page Replacement Algorithms
 	void lru();
 	void fifo();
 	void vms();	
+	
+	//Classes for queue
+	int peek();
+	bool isEmpty();
+	bool isFull();
+	int size();
+	void enqueue(int data);
+	int dequeue();
+	
+	//Varibles for queue
+	#define MAX 6		//size of queue
+	
+	int queue[MAX];
+	int front = 0;
+	int rear = -1;
+	int itemCount = 0;
+	
+	//Function to check if argv is int
 	bool isNumber(char number[]);
 	
+	//Main function
 	int main(int argc, char *argv[]){
-
+		
+		//Hold data from argv's
 		char *file;
-		char *nframes;
+		char *nFrames;
+		int intFrames;		//convert input from char to int
 		char *algo;
 		char *mode;
+		
+		//Size of FIFO queue in VMS
+		int RSS = 0;
+
+		//Final output variables
+		int totalFrames = 0;
+		int eventCount = 0;
+		int readCount = 0;
+		int writeCount = 0;
 		
 		//Load in user input from command line
 		if (argc = 4){
@@ -39,7 +62,9 @@
 			
 			//Check that nrames is an int
 			if (isNumber(argv[2])) {
-				nframes = argv[2];
+				nFrames = argv[2];
+				intFrames = atoi(nFrames);
+				RSS = intFrames/2;
 			}
 			else {
 				printf("Invalid number of frames\n");
@@ -63,10 +88,10 @@
 				printf("Invalid mode argument\n");
 				exit(0);
 			}
-
+			
 			mode = argv[4];
 			
-			printf("%s %s %s %s\n", file, nframes, algo, mode);
+			printf("User input: %s %s %s %s\n", file, nFrames, algo, mode);
 
 		}
 		else {
@@ -75,7 +100,7 @@
 		
 		//DANCODE START HERE
 
-
+		//Read from selected file
 		char addr[7], rw;
 	
 
@@ -123,6 +148,36 @@
 		else if (algo = "vms"){
 			vms();		
 		}
+		
+		//Test queue
+		enqueue(1);
+		enqueue(2);
+		enqueue(3);
+		
+		int q;
+		printf("\nTest queue:\t");
+		for (q = 0; q < size(); q++){
+			printf("%d ",queue[q]);
+		}
+		
+		printf("\nPeek front:\t%d\n", peek());
+		
+		int temp = dequeue();
+		printf("Dequeue:\t%d\n", temp);
+		
+		printf("Test queue:\t");
+		while(!isEmpty()) {
+		  int n = dequeue();           
+		  printf("%d ",n);
+	   	}
+		
+		printf("\n");
+		
+		//Final Output
+		printf("\ntotal memory frames: %d\n", totalFrames);
+		printf("events in trace: %d\n", eventCount);
+		printf("total disk reads: %d\n", readCount);
+		printf("total disk writes: %d\n", writeCount);
 
 		return 0;
 	}
@@ -139,6 +194,51 @@
 	void vms(){
 		printf("Running vms...\n");			
 	}	
+	
+  //Implement functions to support
+	//enqueue(int)		adds to back of queue
+	//dequeue()			removes front of queue
+	
+	int peek() {
+	   return queue[front];
+	}
+	
+	bool isEmpty() {
+	   return itemCount == 0;
+	}
+	
+	bool isFull() {
+	   return itemCount == MAX;
+	}
+	
+	int size() {
+	   return itemCount;
+	}  
+	
+	void enqueue(int data) {
+
+	   if(!isFull()) {
+	
+		  if(rear == MAX-1) {
+		     rear = -1;            
+		  }       
+
+		  queue[++rear] = data;
+		  itemCount++;
+	   }
+	}
+	
+	int dequeue() {
+	   int data = queue[front++];
+	
+	   if(front == MAX) {
+		  front = 0;
+	   }
+	
+	   itemCount--;
+	   return data;  
+	}
+  //End queue functions
 	
 	//Function to check if argv is int
 	bool isNumber(char number[]){
