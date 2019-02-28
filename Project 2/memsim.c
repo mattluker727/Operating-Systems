@@ -3,33 +3,30 @@
 	#include <string.h>
 	#include <stdbool.h>
 	#include <ctype.h>
-	
-	//Page Replacement Algorithms
-	void lru();
-	void fifo();
-	void vms();	
-	
-	//Classes for queue
-	int peek();
-	bool isEmpty();
-	bool isFull();
-	int size();
-	void enqueue(int data);
-	int dequeue();
-	
-	//Varibles for queue
-	#define MAX 6		//size of queue
-	
-	int queue[MAX];
-	int front = 0;
-	int rear = -1;
-	int itemCount = 0;
 
 	//RAM Struct
 	struct memory{
 		unsigned int page;
 		int isDirty;
 	};
+	
+	//Varibles for queue
+	int front = 0;
+	int rear = -1;
+	int itemCount = 0;
+
+	//Page Replacement Algorithms
+	void lru();
+	void fifo();
+	void vms();	
+	
+	//Classes for queue
+	int peek(struct memory queue[]);
+	bool isEmpty();
+	bool isFull(int MAX);
+	int size();
+	void enqueue(struct memory queue[], struct memory data, int MAX);
+	struct memory dequeue(struct memory queue[], int MAX);
 	
 	//Function to check if argv is int
 	bool isNumber(char number[]);
@@ -105,9 +102,6 @@
 			printf("Incorrect number of args\n");		
 		}
 
-		//Initialize RAM
-		struct memory RAM[ramSize];
-
 		//Read in from file
 		FILE *fp = fopen(file, "r");;
 	
@@ -116,30 +110,29 @@
 			exit(1);
 		}
 		
+		//File IO variables
 		int fileSize = 0;
 		unsigned int address[1048576];
 		char rw[1048576];
 
-	
-		//Reads file addresses and RW's into arrays
+		//Declare main mem queue
+		int MAX = ramSize;
+		struct memory queue[MAX];
 		
-		while (fscanf(fp, "%x %c\n", &address[fileSize], &rw[fileSize]) != EOF){
-			printf("%s\n", algo);
-			printf("base address: %08x\n", address[fileSize]);
-			if(algo.equals('fifo') || algo == 'vms'){
-				RAM[fileSize].page = address[fileSize]/4096;
-				printf("ram: %x\n", RAM[fileSize].page);
-				printf("%c\n", rw[fileSize]);
-			}
-			else{
-				printf("pools closed");
-			}
-
+		//Reads file addresses and RW's into arrays
+		while ((fscanf(fp, "%x %c\n", &address[fileSize], &rw[fileSize]) != EOF) && (fileSize < MAX)){
+			//printf("%s\n", algo);
+			//printf("base address: %08x\n", address[fileSize]);
+			
+			queue[fileSize].page = address[fileSize]/4096;
+			queue[fileSize].isDirty = 0;
+			//printf("ram: %x\n", queue[fileSize].page);
+			//printf("%c\n", rw[fileSize]);
 
 			fileSize++;
 		}
 		fclose(fp);
-
+		
 		
 		//Choose algorihm based on user input
 		if (algo == "lru"){
@@ -153,24 +146,25 @@
 		}
 		
 		//Test queue
-		enqueue(1);
-		enqueue(2);
-		enqueue(3);
+		printf("queue.page: %d\n", queue[0].page);
+		enqueue(queue, queue[0], MAX);
+		enqueue(queue, queue[1], MAX);
+		enqueue(queue, queue[2], MAX);
 		
 		int q;
 		printf("\nTest queue:\t");
 		for (q = front; q < rear+1; q++){
-			printf("%d ",queue[q]);
+			printf("%d ",queue[q].page);
 		}
 		
-		printf("\nPeek front:\t%d\n", peek());
+		printf("\nPeek front:\t%d\n", peek(queue));
 		
-		int temp = dequeue();
+		struct memory temp = dequeue(queue, MAX);
 		printf("Dequeue:\t%d\n", temp);
 
 		printf("Test queue:\t");
 		for (q = front; q < rear+1; q++){
-			printf("%d ",queue[q]);
+			printf("%d ",queue[q].page);
 		}
 		
 		printf("\n");
@@ -201,15 +195,15 @@
 	//enqueue(int)		adds to back of queue
 	//dequeue()			removes front of queue
 	
-	int peek() {
-	   return queue[front];
+	int peek(struct memory queue[]) {
+	   return queue[front].page;
 	}
 	
 	bool isEmpty() {
 	   return itemCount == 0;
 	}
 	
-	bool isFull() {
+	bool isFull(int MAX) {
 	   return itemCount == MAX;
 	}
 	
@@ -217,9 +211,9 @@
 	   return itemCount;
 	}  
 	
-	void enqueue(int data) {
+	void enqueue(struct memory queue[], struct memory data, int MAX) {
 
-	   if(!isFull()) {
+	   if(!isFull(MAX)) { 
 	
 		  if(rear == MAX-1) {
 		     rear = -1;            
@@ -230,8 +224,8 @@
 	   }
 	}
 	
-	int dequeue() {
-	   int data = queue[front++];
+	struct memory dequeue(struct memory *queue, int MAX) {
+	   struct memory data = queue[front++];
 	
 	   if(front == MAX) {
 		  front = 0;
