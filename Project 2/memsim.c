@@ -98,45 +98,27 @@
 			printf("Incorrect number of args\n");		
 		}	
 		
-		//DANCODE START HERE
 
-		//Read from selected file
-		char addr[7], rw;
-	
 
-		FILE *fp;
-
-		fp = fopen(file, "r");
+		FILE *fp = fopen(file, "r");;
 	
 		if(fp == NULL){
 			printf("error");
 			exit(1);
 		}
-		char buffer[100000];
+		
 		int fileSize = 0;
-		while(fgets(buffer, sizeof(buffer), fp) != NULL){
+		unsigned int address[1048576];
+		char instr[1048576];
+		
+		//Reads file addresses and RW's into arrays
+		while (fscanf(fp, "%x %c\n", &address[fileSize], &instr[fileSize]) != EOF){
+			printf("%08x\n", address[fileSize]);	
+			printf("%c\n", instr[fileSize]);
 			fileSize++;
 		}
-
-		char holdAddr[fileSize][10];
-		char holdRead[fileSize][1];
-		int i =0;
-
-		while(fscanf(fp, "%s %c", addr, &rw) != EOF){
-
-			strcpy(holdAddr[i], addr);
-			i++;
-		}
-		int j;
-		for(j = 0; j < i; j++){
-			printf(holdAddr[j]);
-			printf("\n");
-		}
-
 		fclose(fp);
 
-
-		//DANCODE END HERE
 		
 		//Choose algorihm based on user input
 		if (algo = "lru"){
@@ -254,4 +236,4 @@
 		        return false;
 		}
 		return true;
-	}
+}

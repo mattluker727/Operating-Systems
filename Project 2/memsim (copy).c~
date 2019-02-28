@@ -1,0 +1,35 @@
+#include <stdio.h>
+
+void main()
+{
+  FILE *fp;
+  int i, type;
+  unsigned int address, instr;
+  unsigned int masked_addr;
+
+  // open trace file for reading
+
+  fp = fopen("c.trace", "r");
+ 
+
+  // read first 100 lines of trace file; 
+  // address holds virtual address in unsigned int format;
+  // N.B. - your program must read all 1,000,000 lines but
+  //        you might want to test it on the first 100 lines
+  //        or so before running it on the entire trace file!
+
+  for (i=0; i<100; ++i) {
+
+    // read 1 line of trace file
+
+    fscanf(fp, "%d %x %x", &type, &address, &instr);
+
+    // output virtual address in hex 
+
+    printf("%8x\n", address);
+  }
+
+  fclose(fp);
+
+}
+
