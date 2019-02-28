@@ -2,6 +2,7 @@
 	#include <stdlib.h>
 	#include <string.h>
 	#include <stdbool.h>
+	#include <ctype.h>
 	
 	//Page Replacement Algorithms
 	void lru();
@@ -23,6 +24,12 @@
 	int front = 0;
 	int rear = -1;
 	int itemCount = 0;
+
+	//RAM Struct
+	struct memory{
+		unsigned int page;
+		int isDirty;
+	};
 	
 	//Function to check if argv is int
 	bool isNumber(char number[]);
@@ -33,7 +40,7 @@
 		//Hold data from argv's
 		char *file;
 		char *nFrames;
-		int intFrames;		//convert input from char to int
+		int ramSize;		//convert input from char to int
 		char *algo;
 		char *mode;
 		
@@ -47,8 +54,8 @@
 		int writeCount = 0;
 		
 		//Load in user input from command line
-		if (argc = 4){
-			//printf("%s\n", argv[1]);
+		if (argc == 5){
+			printf("%s\n", argv[1]);
 			
 			//Check that file is a valid file
 			if (strcmp(argv[1], "bzip.trace")== 0 || strcmp(argv[1], "gcc.trace")== 0 
@@ -63,8 +70,8 @@
 			//Check that nrames is an int
 			if (isNumber(argv[2])) {
 				nFrames = argv[2];
-				intFrames = atoi(nFrames);
-				RSS = intFrames/2;
+				ramSize = atoi(nFrames);
+				RSS = ramSize/2;
 			}
 			else {
 				printf("Invalid number of frames\n");
@@ -96,10 +103,12 @@
 		}
 		else {
 			printf("Incorrect number of args\n");		
-		}	
-		
+		}
 
+		//Initialize RAM
+		struct memory RAM[ramSize];
 
+		//Read in from file
 		FILE *fp = fopen(file, "r");;
 	
 		if(fp == NULL){
@@ -109,31 +118,37 @@
 		
 		int fileSize = 0;
 		unsigned int address[1048576];
-		char instr[1048576];
-		char adrStr[100];
+		char rw[1048576];
 
-		int buf = 3;
-		
+	
 		//Reads file addresses and RW's into arrays
-		while (fscanf(fp, "%x %c\n", &address[fileSize], &instr[fileSize]) != EOF){
-			//printf("%08x\n", address[fileSize]);
-			sprintf(adrStr, "%08x", address[fileSize]);
-			//printf("%.5s\n", adrStr);
-			
-			//printf("%s\n", adrStr + strlen(adrStr) - 3);
+		
+		while (fscanf(fp, "%x %c\n", &address[fileSize], &rw[fileSize]) != EOF){
+			printf("%s\n", algo);
+			printf("base address: %08x\n", address[fileSize]);
+			if(algo.equals('fifo') || algo == 'vms'){
+				RAM[fileSize].page = address[fileSize]/4096;
+				printf("ram: %x\n", RAM[fileSize].page);
+				printf("%c\n", rw[fileSize]);
+			}
+			else{
+				printf("pools closed");
+			}
+
+
 			fileSize++;
 		}
 		fclose(fp);
 
 		
 		//Choose algorihm based on user input
-		if (algo = "lru"){
+		if (algo == "lru"){
 			lru();		
 		}
-		else if (algo = "fifo"){
+		else if (algo == "fifo"){
 			fifo();
 		}	
-		else if (algo = "vms"){
+		else if (algo == "vms"){
 			vms();		
 		}
 		
@@ -144,7 +159,7 @@
 		
 		int q;
 		printf("\nTest queue:\t");
-		for (q = 0; q < size(); q++){
+		for (q = front; q < rear+1; q++){
 			printf("%d ",queue[q]);
 		}
 		
@@ -152,12 +167,11 @@
 		
 		int temp = dequeue();
 		printf("Dequeue:\t%d\n", temp);
-		
+
 		printf("Test queue:\t");
-		while(!isEmpty()) {
-		  int n = dequeue();           
-		  printf("%d ",n);
-	   	}
+		for (q = front; q < rear+1; q++){
+			printf("%d ",queue[q]);
+		}
 		
 		printf("\n");
 		
