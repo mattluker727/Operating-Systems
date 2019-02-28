@@ -110,11 +110,17 @@
 		int fileSize = 0;
 		unsigned int address[1048576];
 		char instr[1048576];
+		char adrStr[100];
+
+		int buf = 3;
 		
 		//Reads file addresses and RW's into arrays
 		while (fscanf(fp, "%x %c\n", &address[fileSize], &instr[fileSize]) != EOF){
-			printf("%08x\n", address[fileSize]);	
-			printf("%c\n", instr[fileSize]);
+			printf("%08x\n", address[fileSize]);
+			sprintf(adrStr, "%08x", address[fileSize]);
+			//printf("%.5s\n", adrStr);
+			
+			//printf("%s\n", adrStr + strlen(adrStr) - 3);
 			fileSize++;
 		}
 		fclose(fp);
