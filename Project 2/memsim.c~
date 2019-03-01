@@ -28,7 +28,7 @@
 	int peekPage(struct Queue* queue);
 	int peekDirty(struct Queue* queue);
 	void printQueue(struct Queue* queue);
-	bool findQueue(struct Queue* queue, int find);
+	int findQueue(struct Queue* queue, int find);
 
 	//Page Replacement Algorithms
 	void lru();
@@ -129,7 +129,7 @@
 		struct Page current;
 		
 		//Reads file addresses and RW's into arrays
-		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF) && (fileSize < 10)){
+		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF) && (fileSize < 11)){
 			//Hold current line from trace
 			int currentPage = address/4096;
 			int currentRW = rw;
@@ -141,8 +141,9 @@
 			
 			//If queue is full, dequeue
 			if (isFull(queue)){
+				printf("\nRAM FULL!");
 				//Check if page already in Page, flip dirty bit if current line is write
-				if (findQueue(queue, currentPage)){
+				if (findQueue(queue, currentPage) == 1){
 					printf("\nAlready in ram!");
 					if(currentRW == 'W'){
 						//find place in ram and replace dirty bit
@@ -151,7 +152,6 @@
 					continue;
 				}
 				//else{
-					printf("\nRAM FULL!");
 					//Check if isDirty, increment write if true
 					int getDirty = 0;
 					getDirty = peekDirty(queue);
@@ -202,6 +202,7 @@
 		}
 		
 		//Final Output
+		totalFrames = fileSize;
 		printf("\n\ntotal memory frames: %d\n", totalFrames);
 		printf("events in trace: %d\n", eventCount);
 		printf("total disk reads: %d\n", readCount);
@@ -268,12 +269,12 @@
 	
 	struct Page rear(struct Queue* queue){ 
 		return queue->ram[queue->rear]; 
-	} 
+	}
 	
 	int peekPage(struct Queue* queue) {
 		return queue->ram[queue->front].page;
 	}
-	
+
 	int peekDirty(struct Queue* queue) {
 		return queue->ram[queue->front].isDirty;
 	}
@@ -285,14 +286,17 @@
 		}
 	}
 	
-	bool findQueue(struct Queue* queue, int find){
+	int findQueue(struct Queue* queue, int find){
 		int q;
+		printf("queue->front: %d\n", queue->front);
+		printf("queue->rear+1: %d\n", queue->rear+1);
 		for (q = queue->front; q < queue->rear+1; q++){
 			if (queue->ram[q].page == find){
-				return true;			
+				printf("hi");
+				return 1;			
 			}
 		}
-		return false;
+		return 0;
 	}
 
   //End queue functions
