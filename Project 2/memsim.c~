@@ -1,35 +1,39 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
+	#include <limits.h>
 	#include <stdbool.h>
 	#include <ctype.h>
 
 	//RAM Struct
-	struct memory{
+	struct Page{
 		unsigned int page;
 		int isDirty;
 	};
+
+	struct Queue { 
+		int front, rear, size; 
+		unsigned capacity; 
+		struct Page *ram; 
+	}; 
 	
-	//Varibles for queue
-	int front = 0;
-	int rear = -1;
-	int itemCount = 0;
-	
+	//Classes for queue
+	struct Queue* createQueue(unsigned capacity);
+	int isFull(struct Queue* queue);
+	int isEmpty(struct Queue* queue);
+	void enqueue(struct Queue* queue, struct Page data);
+	struct Page dequeue(struct Queue* queue);
+	struct Page front(struct Queue* queue);
+	struct Page rear(struct Queue* queue);
+	int peekPage(struct Queue* queue);
+	int peekDirty(struct Queue* queue);
+	void printQueue(struct Queue* queue);
+	bool findQueue(struct Queue* queue, int find);
+
 	//Page Replacement Algorithms
 	void lru();
 	void fifo();
 	void vms();	
-	
-	//Classes for queue
-	int peekPage(struct memory queue[]);
-	int peekDirty(struct memory queue[]);
-	bool isEmpty();
-	bool isFull(int MAX);
-	int size();
-	void enqueue(struct memory queue[], struct memory data, int MAX);
-	struct memory dequeue(struct memory queue[], int MAX);
-	void printQueue(struct memory queue[]);
-	bool findQueue(struct memory queue[], int find);
 	
 	//Function to check if argv is int
 	bool isNumber(char number[]);
@@ -120,9 +124,9 @@
 		
 		//Declare main mem queue
 		int MAX = ramSize;
-		struct memory queue[MAX];
-		struct memory temp;
-		struct memory current;
+    	struct Queue* queue = createQueue(MAX); 
+		struct Page temp;
+		struct Page current;
 		
 		//Reads file addresses and RW's into arrays
 		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF) && (fileSize < 10)){
@@ -136,18 +140,18 @@
 			printf("\n\nCURRENT LINE: %d, %c", currentPage, currentRW);
 			
 			//If queue is full, dequeue
-			if (isFull(MAX)){
-				//Check if page already in memory, flip dirty bit if current line is write
+			if (isFull(queue)){
+				//Check if page already in Page, flip dirty bit if current line is write
 				if (findQueue(queue, currentPage)){
-					printf("\nAlready in queue!");
+					printf("\nAlready in ram!");
 					if(currentRW == 'W'){
-						//find place in queue and replace dirty bit
-						//queue[fileSize].isDirty = 1;
+						//find place in ram and replace dirty bit
+						//queue->ram[fileSize].isDirty = 1;
 					}
 					continue;
 				}
-				else{
-					printf("\nQUEUE FULL!");
+				//else{
+					printf("\nRAM FULL!");
 					//Check if isDirty, increment write if true
 					int getDirty = 0;
 					getDirty = peekDirty(queue);
@@ -158,13 +162,13 @@
 					}
 					printf("writeCount:\t%d\n", writeCount);
 					//dequeue front of queue
-					temp = dequeue(queue, MAX);
+					temp = dequeue(queue);
 					printf("Dequeued:\t%d\n", temp);
 					printf("Dequeue:\t");
 					printQueue(queue);
-				}
+				//}
 			}
-		  //Add new address to queue
+		  //Add new address to ram
 			//Intitialize struct
 			if (currentRW == 'R'){
 				current.isDirty = 0;
@@ -173,8 +177,8 @@
 				current.isDirty = 1;
 			}
 			//Enqueue struct
-			enqueue(queue, current, MAX);
-			//Print new queue
+			enqueue(queue, current);
+			//Print new ram
 			printf("\nQueue:\t\t");
 			printQueue(queue);
 			//Increment readCount
@@ -219,70 +223,72 @@
 		printf("Running vms...\n");			
 	}	
 	
-  //Implement functions to support
-	//enqueue(int)		adds to back of queue
-	//dequeue()			removes front of queue
-	
-	int peekPage(struct memory queue[]) {
-		return queue[front].page;
-	}
+  //Implement functions to support queue
 
-	int peekDirty(struct memory queue[]) {
-		return queue[front].isDirty;
-	}
-	
-	bool isFull(int MAX) {
-		return itemCount == MAX;
-	}
-	
-	bool isEmpty() {
-		return itemCount == 0;
-	}
-	
-	int size() {
-		return itemCount;
-	}  
-	
-	void enqueue(struct memory queue[], struct memory data, int MAX) {
+	struct Queue* createQueue(unsigned capacity){ 
+		struct Queue* queue = (struct Queue*) malloc(sizeof(struct Queue)); 
+		queue->capacity = capacity; 
+		queue->front = queue->size = 0;  
+		queue->rear = capacity - 1;
+		queue->ram = (struct Page*) malloc(queue->capacity); 
+		return queue; 
+	} 
 
-		if(!isFull(MAX)) { 
+	int isFull(struct Queue* queue){
+		return (queue->size == queue->capacity);
+	}
 	
-			if(rear == MAX-1) {
-				rear = -1;            
-			}       
-
-			rear = (rear+ 1)%MAX; 
-			
-			queue[rear] = data;
-			itemCount++;
+	// Queue is empty when size is 0 
+	int isEmpty(struct Queue* queue){
+		return (queue->size == 0);
+	} 
+	
+	void enqueue(struct Queue* queue, struct Page item) {
+		if (isFull(queue)){
+			return; 
 		}
+	
+		queue->rear = (queue->rear + 1)%queue->capacity; 
+		queue->ram[queue->rear] = item; 
+		queue->size = queue->size + 1; 
+		//printf("\n%d enqueued to queue\n", item.page); 
 	}
 	
-	struct memory dequeue(struct memory queue[], int MAX) {
-		struct memory data = queue[front++];
-	
-		if (isEmpty(queue)) 
-        	return; 
+	struct Page dequeue(struct Queue* queue) {
 		
-		struct memory item = queue[front]; 
-    	front = (front + 1)%MAX;
-		
-		itemCount--;
-		return item;  
+		struct Page item = queue->ram[queue->front]; 
+		queue->front = (queue->front + 1)%queue->capacity; 
+		queue->size = queue->size - 1; 
+		return item;
 	}
-
-	void printQueue(struct memory queue[]){
+	
+	struct Page front(struct Queue* queue){ 
+		return queue->ram[queue->front]; 
+	} 
+	
+	struct Page rear(struct Queue* queue){ 
+		return queue->ram[queue->rear]; 
+	} 
+	
+	int peekPage(struct Queue* queue) {
+		return queue->ram[queue->front].page;
+	}
+	
+	int peekDirty(struct Queue* queue) {
+		return queue->ram[queue->front].isDirty;
+	}
+	
+	void printQueue(struct Queue* queue){
 		int q;
-		for (q = front; q < rear+1; q++){
-			printf("%d ",queue[q].page);
+		for (q = queue->front; q < queue->rear+1; q++){
+			printf("%d ",queue->ram[q].page);
 		}
 	}
-
-	bool findQueue(struct memory queue[], int find){
-		int q = front;
-		
-		for (q = front; q < rear+1; q++){
-			if (queue[q].page == find){
+	
+	bool findQueue(struct Queue* queue, int find){
+		int q;
+		for (q = queue->front; q < queue->rear+1; q++){
+			if (queue->ram[q].page == find){
 				return true;			
 			}
 		}
