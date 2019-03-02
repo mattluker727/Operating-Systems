@@ -133,49 +133,49 @@
 			//Hold current line from trace
 			int currentPage = address/4096;
 			int currentRW = rw;
-			//Initialize current struct
+			//Initialize page struct
 			current.page = currentPage; 
-			current.isDirty = 0;
-			
-			printf("\n\nCURRENT LINE: %d, %c", currentPage, currentRW);
-			
-			//If queue is full, dequeue
-			if (isFull(queue)){
-				printf("\nRAM FULL!");
-				//Check if page already in Page, flip dirty bit if current line is write
-				if (findQueue(queue, currentPage) == 1){
-					printf("\nAlready in ram!");
-					if(currentRW == 'W'){
-						//find place in ram and replace dirty bit
-						//queue->ram[fileSize].isDirty = 1;
-					}
-					continue;
-				}
-				//else{
-					//Check if isDirty, increment write if true
-					int getDirty = 0;
-					getDirty = peekDirty(queue);
-					printf("\npeekPage\t%d\n", peekPage(queue));
-					printf("getDirty:\t%d\n", peekDirty(queue));
-					if (peekDirty(queue) == 1){
-						writeCount ++;
-					}
-					printf("writeCount:\t%d\n", writeCount);
-					//dequeue front of queue
-					temp = dequeue(queue);
-					printf("Dequeued:\t%d\n", temp);
-					printf("Dequeue:\t");
-					printQueue(queue);
-				//}
-			}
-		  //Add new address to ram
-			//Intitialize struct
+			//Intitialize diry struct
 			if (currentRW == 'R'){
 				current.isDirty = 0;
 			}
 			else {
 				current.isDirty = 1;
 			}
+			
+			printf("\n\nCURRENT LINE: %d, %c", currentPage, currentRW);
+
+			//Check if page already in Page, flip dirty bit if current line is write
+			if (findQueue(queue, currentPage) != 0){
+					printf("\nAlready in ram!");
+					if(currentRW == 'W'){
+						//find place in ram and replace dirty bit
+						printf("Dirty bit: %d\n", queue->ram[findQueue(queue, currentPage)].isDirty);
+						queue->ram[findQueue(queue, currentPage)].isDirty = 1;
+						printf("Dirty bit: %d\n", queue->ram[findQueue(queue, currentPage)].isDirty);
+					}
+					continue;
+				}
+			//If queue is full, dequeue
+			if (isFull(queue)){
+				printf("\nRAM FULL!");
+				//Check if isDirty, increment write if true
+				int getDirty = 0;
+				getDirty = peekDirty(queue);
+				printf("\npeekPage\t%d\n", peekPage(queue));
+				printf("getDirty:\t%d\n", peekDirty(queue));
+				if (peekDirty(queue) == 1){
+					writeCount ++;
+				}
+				printf("writeCount:\t%d\n", writeCount);
+				//dequeue front of queue
+				temp = dequeue(queue);
+				printf("Dequeued:\t%d\n", temp);
+				//printf("Dequeue:\t");
+				//printQueue(queue);
+				
+			}
+		  //Add new address to ram
 			//Enqueue struct
 			enqueue(queue, current);
 			//Print new ram
@@ -183,7 +183,7 @@
 			printQueue(queue);
 			//Increment readCount
 			readCount++;
-			printf("\nreadCount:\t%d", readCount);
+			//printf("\nreadCount:\t%d", readCount);
 			
 			fileSize++;
 		}
@@ -281,19 +281,20 @@
 	
 	void printQueue(struct Queue* queue){
 		int q;
-		for (q = queue->front; q < queue->rear+1; q++){
+		for (q = queue->front; q < queue->capacity; q++){
+			printf("%d ",queue->ram[q].page);
+		}
+		
+		for (q = 0; q < queue->rear+1; q++){
 			printf("%d ",queue->ram[q].page);
 		}
 	}
 	
 	int findQueue(struct Queue* queue, int find){
 		int q;
-		printf("queue->front: %d\n", queue->front);
-		printf("queue->rear+1: %d\n", queue->rear+1);
-		for (q = queue->front; q < queue->rear+1; q++){
+		for (q = 0; q < queue->capacity; q++){
 			if (queue->ram[q].page == find){
-				printf("hi");
-				return 1;			
+				return q;			
 			}
 		}
 		return 0;
