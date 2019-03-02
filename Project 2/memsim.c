@@ -15,7 +15,7 @@
 		int front, rear, size; 
 		unsigned capacity; 
 		struct Page *ram; 
-	}; 
+	};
 	
 	//Functions to support queue
 	struct Queue* createQueue(unsigned capacity);
@@ -31,9 +31,9 @@
 	int findQueue(struct Queue* queue, int find);
 
 	//Page Replacement Algorithms
-	void fifo();
-	void lru();
-	void vms();
+	void fifo(char *file, int nFrames, bool debug);
+	void lru(char *file, int nFrames, bool debug);
+	void vms(char *file, int nFrames, bool debug);
 	
 	//Function to check if argv is int
 	bool isNumber(char number[]);
@@ -51,8 +51,8 @@
 		char *file;
 		int nFrames;
 		char *algo;
-		char *mode;
-		
+		bool debug = false;
+
 		//Size of FIFO queue in VMS
 		int RSS = 0;
 		
@@ -89,15 +89,23 @@
 			
 			//Check choice of mode
 			if (strcmp(argv[4], "debug")== 0 || strcmp(argv[4], "quiet")== 0){
-				mode = argv[4];
+				if (strcmp(argv[4], "debug")== 0){
+					debug = true;
+				}
 			}
 			else {
 				printf("Invalid mode argument\n");
 				exit(0);
 			}
-						
-			printf("User input: %s %d %s %s\n", file, nFrames, algo, mode);
-
+			
+			//Print user choices
+			printf("User input: %s %d %s ", file, nFrames, algo);
+			if (debug){
+				printf("debug \n");
+			}
+			else {
+				printf("quiet \n");
+			}
 		}
 		else {
 			printf("Incorrect number of args\n");		
@@ -105,13 +113,13 @@
 		
 		//Choose algorihm based on user input
 		if (strcmp(algo, "fifo")== 0){
-			fifo(file, nFrames);
+			fifo(file, nFrames, debug);
 		}
 		else if (strcmp(algo, "lru")== 0){
-			lru(file, nFrames);
+			lru(file, nFrames, debug);
 		}
 		else if (strcmp(algo, "vms")== 0){
-			vms(file, nFrames);
+			vms(file, nFrames, debug);
 		}
 		
 		//Final Output
@@ -124,7 +132,7 @@
 	}
 	
 	//External replacment algorithms
-	void fifo(char *file, int nFrames){
+	void fifo(char *file, int nFrames, bool debug){
 				//Read in from file
 		FILE *fp = fopen(file, "r");;
 		if(fp == NULL){
@@ -156,7 +164,7 @@
 				current.isDirty = 1;
 			}
 			
-			printf("\n\nCURRENT LINE: %d, %c\n", currentPage, currentRW);
+			printf("\n\nCURRENT LINE:\t%d, %c\n", currentPage, currentRW);
 
 			//Check if page already in Page, flip dirty bit if current line is write
 			if (findQueue(queue, currentPage) != 0){
@@ -177,7 +185,7 @@
 				printf("Dequeue:\t%d\n", peekPage(queue));
 				int getDirty = peekDirty(queue);
 				if (getDirty == 1){
-					printf("getDirty:\t%d\n", getDirty);
+					printf("Dirty page removed!\n");
 					writeCount ++;
 					printf("writeCount:\t%d\n", writeCount);
 				}
@@ -200,13 +208,13 @@
 		fclose(fp);		
 	}
 
-	void lru(char *file, int nFrames){
+	void lru(char *file, int nFrames, bool debug){
 		printf("Running lru...\n");		
 	}
 	
-	void vms(char *file, int nFrames){
+	void vms(char *file, int nFrames, bool debug){
 		printf("Running vms...\n");			
-	}	
+	}
 	
   //Implement functions to support queue
 

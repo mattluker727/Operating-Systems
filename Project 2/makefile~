@@ -1,8 +1,0 @@
-make:
-	gcc -o sc memsim.c
-
-runm:
-	./m
-
-clean:
-	rm ./m
