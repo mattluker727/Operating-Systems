@@ -1,0 +1,8 @@
+make:
+	gcc -o m memsimLRU.c
+
+runm:
+	./m
+
+clean:
+	rm ./m
