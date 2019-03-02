@@ -41,7 +41,6 @@
 	bool isNumber(char number[]);
 
 	//Final output variables
-	int totalFrames = 0;
 	int eventCount = 0;
 	int readCount = 0;
 	int writeCount = 0;
@@ -125,7 +124,7 @@
 		}
 		
 		//Final Output
-		printf("\n\ntotal memory frames: %d\n", totalFrames);
+		printf("\n\ntotal memory frames: %d\n", nFrames);
 		printf("events in trace: %d\n", eventCount);
 		printf("total disk reads: %d\n", readCount);
 		printf("total disk writes: %d\n", writeCount);
@@ -152,7 +151,7 @@
 		struct Page current;
 		
 		//Reads file addresses and RW's into arrays
-		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF) && (totalFrames < 10)){
+		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF) && (eventCount < 100)){
 			//Hold current line from trace
 			int currentPage = address/4096;
 			int currentRW = rw;
@@ -206,8 +205,9 @@
 			readCount++;
 			//printf("\nreadCount:\t%d", readCount);
 			
-			totalFrames++;
+			eventCount++;
 		}
+		
 		//Close file
 		fclose(fp);		
 	}
