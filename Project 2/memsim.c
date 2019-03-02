@@ -179,7 +179,7 @@
 			//Enqueue struct
 			enqueue(queue, current);
 			//Print new ram
-			printf("\nQueue:\t\t");
+			printf("Queue:\t\t");
 			printQueue(queue);
 			//Increment readCount
 			readCount++;
@@ -281,12 +281,20 @@
 	
 	void printQueue(struct Queue* queue){
 		int q;
-		for (q = queue->front; q < queue->capacity; q++){
-			printf("%d ",queue->ram[q].page);
+		if (queue->front == queue->rear+1){
+			for (q = queue->front; q < queue->capacity; q++){
+				printf("%d ",queue->ram[q].page);
+			}
+			
+			for (q = 0; q < queue->rear+1; q++){
+				printf("%d ",queue->ram[q].page);
+			}
 		}
-		
-		for (q = 0; q < queue->rear+1; q++){
-			printf("%d ",queue->ram[q].page);
+		else{
+			for (q = queue->front; q < queue->rear+1; q++){
+				printf("%d ",queue->ram[q].page);
+			}
+
 		}
 	}
 	
