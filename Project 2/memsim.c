@@ -4,7 +4,7 @@
 	#include <limits.h>
 	#include <stdbool.h>
 	#include <ctype.h>
-
+	
 	//RAM Struct
 	struct Page{
 		unsigned int page;
@@ -33,30 +33,29 @@
 	void ageSort(struct Queue* queue, int itemCount);
 
 	//Page Replacement Algorithms
-	void fifo(char *file, int nFrames, bool debug);
-	void lru(char *file, int nFrames, bool debug);
-	void vms(char *file, int nFrames, bool debug);
+	void fifo();
+	void lru();
+	void vms();
 	
 	//Function to check if argv is int
 	bool isNumber(char number[]);
-
+	
 	//Final output variables
 	int eventCount = 0;
 	int readCount = 0;
 	int writeCount = 0;
-
+	
+	//Hold data from argv's
+	char *file;
+	int nFrames;
+	char *algo;
+	bool debug = false;
+	
+	//Size of FIFO queue in VMS
+	int RSS = 0;
+	
 	//Main function
 	int main(int argc, char *argv[]){
-		
-		//Hold data from argv's
-		char *file;
-		int nFrames;
-		char *algo;
-		bool debug = false;
-
-		//Size of FIFO queue in VMS
-		int RSS = 0;
-		
 		//Load in user input from command line
 		if (argc == 5){
 			//Check that file is a valid file
@@ -100,13 +99,13 @@
 			}
 			
 			//Print user choices
-			printf("User input: %s %d %s ", file, nFrames, algo);
-			if (debug){
-				printf("debug \n");
-			}
-			else {
-				printf("quiet \n");
-			}
+			//printf("User input: %s %d %s ", file, nFrames, algo);
+			//if (debug){
+			//	printf("debug \n");
+			//}
+			//else {
+			//	printf("quiet \n");
+			//}
 		}
 		else {
 			printf("Incorrect number of args\n");		
@@ -114,17 +113,17 @@
 		
 		//Choose algorihm based on user input
 		if (strcmp(algo, "fifo")== 0){
-			fifo(file, nFrames, debug);
+			fifo();
 		}
 		else if (strcmp(algo, "lru")== 0){
-			lru(file, nFrames, debug);
+			lru();
 		}
 		else if (strcmp(algo, "vms")== 0){
-			vms(file, nFrames, debug);
+			vms();
 		}
 		
 		//Final Output
-		printf("\n\ntotal memory frames: %d\n", nFrames);
+		printf("\ntotal memory frames: %d\n", nFrames);
 		printf("events in trace: %d\n", eventCount);
 		printf("total disk reads: %d\n", readCount);
 		printf("total disk writes: %d\n", writeCount);
@@ -133,7 +132,7 @@
 	}
 	
 	//External replacment algorithms
-	void fifo(char *file, int nFrames, bool debug){
+	void fifo(){
 				//Read in from file
 		FILE *fp = fopen(file, "r");;
 		if(fp == NULL){
@@ -151,7 +150,7 @@
 		struct Page current;
 		
 		//Reads file addresses and RW's into arrays
-		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF) && (eventCount < 1000)){
+		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF) && (eventCount < 11)){
 			//Hold current line from trace
 			int currentPage = address/4096;
 			int currentRW = rw;
@@ -167,30 +166,28 @@
 			}
 			
 			//CHANGE: %d -> %x
-			printf("\n\nCURRENT LINE:\t%x, %c\n", currentPage, currentRW);
+			if (debug) printf("Current Request:%x, %c\n", currentPage, currentRW);
 
 			//Check if page already in Page, flip dirty bit if current line is write
-			if (findQueue(queue, currentPage) != 0){
-					printf("Already in ram!");
-					if(currentRW == 'W'){
-						//find place in ram and replace dirty bit
-						printf("Dirty bit: %d\n", queue->ram[findQueue(queue, currentPage)].isDirty);
-						queue->ram[findQueue(queue, currentPage)].isDirty = 1;
-						printf("Dirty bit: %d\n", queue->ram[findQueue(queue, currentPage)].isDirty);
-					}
-					eventCount++;
-					continue;
+			if (findQueue(queue, currentPage) != -1){
+				if (debug) printf("Already in RAM!\n");
+				if(currentRW == 'W'){
+					int found = findQueue(queue, currentPage);
+					//find place in ram and replace dirty bit
+					if (debug) printf("Dirty bit changed to 1\n\n");
+					queue->ram[findQueue(queue, currentPage)].isDirty = 1;
+				}
+				eventCount++;
+				continue;
 			}
 			//If queue is full, dequeue
 			if (isFull(queue)){
-				printf("RAM FULL!\n");
 				//Check if isDirty, increment write if true
-				printf("Dequeue:\t%x\n", peekPage(queue));
+				if (debug) printf("RAM Full!\nDequeue:\t%x\n", peekPage(queue));
 				int getDirty = peekDirty(queue);
 				if (getDirty == 1){
-					printf("Dirty page removed!\n");
 					writeCount ++;
-					printf("writeCount:\t%d\n", writeCount);
+					if (debug) printf("Dirty page removed!\nwriteCount:\t%d\n", writeCount);
 				}
 				//dequeue front of queue
 				dequeue(queue);
@@ -199,12 +196,14 @@
 			//Enqueue struct
 			enqueue(queue, current);
 			//Print new ram
-			printf("Queue:\t\t");
-			printQueue(queue);
+			if (debug){
+				printf("Queue:\t\t");
+				printQueue(queue);
+				printf("\n\n");
+			}
 			//Increment readCount
 			readCount++;
 			//printf("\nreadCount:\t%d", readCount);
-			
 			eventCount++;
 		}
 		
@@ -212,7 +211,7 @@
 		fclose(fp);		
 	}
 	
-	void lru(char *file, int nFrames, bool debug){
+	void lru(){
 		//Read in from file
 		FILE *fp = fopen(file, "r");;
 		if(fp == NULL){
@@ -246,17 +245,17 @@
 			}
 			
 			//CHANGE: %d -> %x
-			printf("\n\nCURRENT LINE:\t%x, %c\n", currentPage, currentRW);
+			if (debug) printf("\n\nCURRENT LINE:\t%x, %c\n", currentPage, currentRW);
 
 			//Check if page already in Page, flip dirty bit if current line is write
 			if (findQueue(queue, currentPage) != 0){
-					printf("Already in ram!");
-					queue->ram[findQueue(queue, currentPage)].age = 0;
+					if (debug) printf("Already in RAM!");
+					int found = findQueue(queue, currentPage);
+					queue->ram[found].age = 0;
 					if(currentRW == 'W'){
 						//find place in ram and replace dirty bit
-						printf("Dirty bit: %d\n", queue->ram[findQueue(queue, currentPage)].isDirty);
+						if (debug) printf("Dirty bit changed to 1\n");
 						queue->ram[findQueue(queue, currentPage)].isDirty = 1;
-						printf("Dirty bit: %d\n", queue->ram[findQueue(queue, currentPage)].isDirty);
 					}
 					ageSort(queue, queue->size);
 					eventCount++;
@@ -264,14 +263,13 @@
 			}
 			//If queue is full, dequeue
 			if (isFull(queue)){
-				printf("RAM FULL!\n");
+				if (debug) printf("RAM FULL!\n");
 				//Check if isDirty, increment write if true
-				printf("Dequeue:\t%x\n", peekPage(queue));
+				if (debug) printf("Dequeue:\t%x\n", peekPage(queue));
 				int getDirty = peekDirty(queue);
 				if (getDirty == 1){
-					printf("Dirty page removed!\n");
 					writeCount ++;
-					printf("writeCount:\t%d\n", writeCount);
+					if (debug) printf("Dirty page removed!\nwriteCount:\t%d\n", writeCount);
 				}
 				//dequeue front of queue
 				dequeue(queue);
@@ -280,12 +278,12 @@
 			//Enqueue struct
 			enqueue(queue, current);
 			//Print new ram
-			printf("Queue:\t\t");
+			if (debug) printf("Queue:\t\t");
 			//ageSort(queue, queue->size);
 			
 			ageSort(queue, queue->size);
 			
-			printQueue(queue);
+			if (debug) printQueue(queue);
 			//Increment readCount
 			readCount++;
 			//printf("\nreadCount:\t%d", readCount);
@@ -296,7 +294,7 @@
 		fclose(fp);		
 	}
 	
-	void vms(char *file, int nFrames, bool debug){
+	void vms(){
 		printf("Running vms...\n");			
 	}
 	
@@ -362,18 +360,24 @@
 		if (queue->front == queue->rear+1){
 			for (q = queue->front; q < queue->capacity; q++){
 				printf("%x ",queue->ram[q].page);
-				printf("%i ", queue->ram[q].age);
+				if (strcmp(algo, "lru")== 0){
+					printf("%i ", queue->ram[q].age);
+				}
 			}
 			
 			for (q = 0; q < queue->rear+1; q++){
 				printf("%x ",queue->ram[q].page);
-				printf("%i ", queue->ram[q].age);
+				if (strcmp(algo, "lru")== 0){
+					printf("%i ", queue->ram[q].age);
+				}
 			}
 		}
 		else{
 			for (q = queue->front; q < queue->rear+1; q++){
 				printf("%x ",queue->ram[q].page);
-				printf("%i ", queue->ram[q].age);
+				if (strcmp(algo, "lru")== 0){
+					printf("%i ", queue->ram[q].age);
+				}
 			}
 
 		}
@@ -386,7 +390,7 @@
 				return q;			
 			}
 		}
-		return 0;
+		return -1;
 	}
 
 	void ageSort(struct Queue* queue, int itemCount){
