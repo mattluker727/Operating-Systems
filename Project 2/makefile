@@ -1,6 +1,5 @@
 make:
-	gcc -o m memsim.c
-
+	gcc -o m memsim.c -lm
 runm:
 	./m
 
