@@ -682,7 +682,7 @@
 	
 	//CHANGE: %d -> %x
 	void printQueue(struct Queue* queue){
-		printf("current queue size: %d, current front point: %d [", queue->size, queue->front);
+		printf("current queue size: %d, current front point: %d", queue->size, queue->front);
 		printf("[");
 		int q;
 		int pFront = queue->front;
