@@ -313,8 +313,8 @@
 		//Declare main mem queue
 		struct Queue* FIFOA = createQueue(nFrames/2);
 		struct Queue* FIFOB = createQueue(nFrames/2);
-   		struct Queue* Clean = createQueue((nFrames/2)+1); 
    		struct Queue* Dirty = createQueue((nFrames/2)+1); 
+   		struct Queue* Clean = createQueue((nFrames/2)+1); 
    		struct Queue* Memory = createQueue(nFrames);
 
 		unsigned int Mefmory[nFrames];
@@ -341,15 +341,20 @@
 			enqueue(FIFOB, fill);
 		}
 		
-		
-		//printf("FIFOB: ");
-		//dequeue(FIFOB);
-		//enqueue(FIFOB, fill);
-		//printQueue(FIFOB);
-		//printf("\n");
+		//Setup Clean and Dirty
+		for (f = 0; f < (nFrames/2); f++){
+			dequeue(Clean);
+			enqueue(Clean, fill);
+			dequeue(Clean);
+		}
 		Dirty = copyQueue(Clean);
 
-
+		for (f = 0; f < (nFrames/2); f++){
+			dequeue(Dirty);
+			enqueue(Dirty, fill);
+			dequeue(Dirty);
+		}
+		
 		//Temp to track current trace
 		struct Page current;
 		
@@ -440,13 +445,7 @@
 					}
 					else{
 						while(count){
-							printf("Count %i\n", count);
-							printQueue(Dirty);
-							printf("\n");
 							hold = dequeue(Dirty);
-							printf("hold: %x\n", hold.page);
-							printQueue(Dirty);
-							printf("\n\n");
 							if (hold.page != current.page){
 								enqueue(Dirty, hold);
 							}
