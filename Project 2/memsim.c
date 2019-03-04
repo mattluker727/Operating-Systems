@@ -312,7 +312,7 @@
 		
 		//Declare main mem queue
 		struct Queue* FIFOA = createQueue(nFrames/2);
-		struct Queue* FIFOB = createQueue(nFrames/2);
+		struct Queue* FIFOB = createQueue(nFrames/4);
 		struct Queue* Clean = createQueue((nFrames/2)+1); 
 		struct Queue* Dirty = createQueue((nFrames/2)+1); 
 		struct Queue* Memory = createQueue(nFrames);
