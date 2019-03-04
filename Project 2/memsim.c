@@ -312,7 +312,7 @@
 		
 		//Declare main mem queue
 		struct Queue* FIFOA = createQueue(nFrames/2);
-		struct Queue* FIFOB = createQueue(nFrames/4);
+		struct Queue* FIFOB = createQueue(nFrames/2);
 		struct Queue* Clean = createQueue((nFrames/2)+1); 
 		struct Queue* Dirty = createQueue((nFrames/2)+1); 
 		struct Queue* Memory = createQueue(nFrames);
@@ -325,23 +325,23 @@
 		//for(val = 0; val < nFrames; val++) printf("memval: %x\n", Mefmory[val]);
 	
 		//Fill FIFOA and FIFOB with null pages
-		// struct Page fill;
-		// struct Page fill2;
-		// fill.page = -1;
-		// fill2.page = -1;
-		// int f;
-		// for (f = 0; f < (nFrames/2); f++){
-		// 	dequeue(FIFOA);
-		// 	enqueue(FIFOA, fill);
-		// }
-		// FIFOB = copyQueue(FIFOA);
+		struct Page fill;
+		struct Page fill2;
+		fill.page = -1;
+		fill2.page = -1;
+		int f;
+		for (f = 0; f < (nFrames/2); f++){
+			dequeue(FIFOA);
+			enqueue(FIFOA, fill);
+		}
+		//FIFOB = copyQueue(FIFOA);
 
-		// for (f = 0; f < (nFrames/2); f++){
-		// 	dequeue(FIFOB);
-		// 	enqueue(FIFOB, fill);
-		// }
+		for (f = 0; f < (nFrames/2); f++){
+			dequeue(FIFOB);
+			enqueue(FIFOB, fill);
+		}
 		
-		// //Setup Clean and Dirty
+		//Setup Clean and Dirty
 		// for (f = 0; f < (nFrames/2); f++){
 		// 	dequeue(Clean);
 		// 	enqueue(Clean, fill);
@@ -652,7 +652,8 @@
 		queue->capacity = capacity; 
 		queue->front = queue->size = 0;  
 		queue->rear = capacity - 1;
-		queue->ram = (struct Page*) malloc(queue->capacity); 
+		queue->ram = (struct Page*) malloc(queue->capacity * sizeof(struct Page)); 
+
 		return queue; 
 	}
 	
