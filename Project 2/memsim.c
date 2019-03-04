@@ -313,9 +313,9 @@
 		//Declare main mem queue
 		struct Queue* FIFOA = createQueue(nFrames/2);
 		struct Queue* FIFOB = createQueue(nFrames/2);
-   		struct Queue* Clean = createQueue((nFrames/2)+1); 
-   		struct Queue* Dirty = createQueue((nFrames/2)+1); 
-   		struct Queue* Memory = createQueue(nFrames);
+		struct Queue* Clean = createQueue((nFrames/2)+1); 
+		struct Queue* Dirty = createQueue((nFrames/2)+1); 
+		struct Queue* Memory = createQueue(nFrames);
 		
 		unsigned int Mefmory[nFrames];
 		int val;
@@ -703,33 +703,13 @@
 	
 	//CHANGE: %d -> %x
 	void printQueue(struct Queue* queue){
-		int q;
 		printf("[");
-		if (queue->front == queue->rear+1){
-			for (q = queue->front; q < queue->capacity; q++){
-				if (queue->ram[q].page == -1 || queue->ram[q].page == 0) continue;
-				printf("%x ",queue->ram[q].page);
-				if (strcmp(algo, "lru")== 0){
-					printf("%i ", queue->ram[q].age);
-				}
-			}
-			
-			for (q = 0; q < queue->rear+1; q++){
-				if (queue->ram[q].page == -1 || queue->ram[q].page == 0) continue;
-				printf("%x ",queue->ram[q].page);
-				if (strcmp(algo, "lru")== 0){
-					printf("%i ", queue->ram[q].age);
-				}
-			}
-		}
-		else{
-			for (q = queue->front; q < queue->rear+1; q++){
-				if (queue->ram[q].page == -1 || queue->ram[q].page == 0) continue;
-				printf("%x ",queue->ram[q].page);
-				if (strcmp(algo, "lru")== 0){
-					printf("%i ", queue->ram[q].age);
-				}
-			}
+		int q;
+		int pFront = queue->front;
+		for (q = 0; q < queue->size; q++){
+			//if (queue->ram[q].page == -1 || queue->ram[q].page == 0) continue;
+			printf("%x ",queue->ram[pFront].page);
+			pFront = (pFront+1)%queue->capacity;
 		}
 		printf("]");
 	}
