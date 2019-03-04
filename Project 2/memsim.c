@@ -34,7 +34,7 @@
 	int findQueue(struct Queue* queue, int find);
 	void ageSort(struct Queue* queue, int itemCount);
 	struct Queue *copyQueue(struct Queue *qOne);
-	int inMemory(struct Page Mefmory[], unsigned int target);
+	int inMemory(struct Page Mefmory[], unsigned int target, int size);
 
 	//Page Replacement Algorithms
 	void fifo();
@@ -157,7 +157,7 @@
 		struct Page current;
 		
 		//Reads file addresses and RW's into arrays
-		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF) && (eventCount < 30)){
+		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF)){
 			//Hold current line from trace
 			int currentPage = address/4096;
 			int currentRW = rw;
@@ -241,7 +241,7 @@
 		struct Page current;
 		
 		//Reads file addresses and RW's into arrays
-		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF) && (eventCount < 1000)){
+		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF)){
 			//Hold current line from trace
 			int currentPage = address/4096;
 			int currentRW = rw;
@@ -334,7 +334,7 @@
 		int val;
 
 		//Initialize all of Memory to 0
-		for(val = 0; val < nFrames; val++) Mefmory[val].page = 0;	
+		for(val = 0; val < nFrames; val++) Mefmory[val].page = -1;	
 		//for(val = 0; val < nFrames; val++) printf("memval: %x\n", Mefmory[val]);
 	
 		//Fill FIFOA and FIFOB with null pages
@@ -350,7 +350,7 @@
 		struct Page current;
 		
 		//Reads file addresses and RW's into arrays
-		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF) && (eventCount < 16)){
+		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF )){
 			//Hold current line from trace
 			int currentPage = address/4096;
 			int currentRW = rw;
@@ -375,6 +375,7 @@
 				check3 = temp3;
 				temp3 /= 16;
 			}
+
 			//Assign current page to team
 			current.isTeamA = false;
 			if (check3 == 3) current.isTeamA = true;
@@ -404,7 +405,7 @@
 						printf("\n");
 						printf("Memory:\t\t[");
 						int kl;
-						for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl].page != 0) printf("%x  ", Mefmory[kl].page);
+						for(kl = 0; kl < nFrames; kl++)  printf("%x  ", Mefmory[kl].page);
 						printf("]\n\n");
 					}
 					continue;
@@ -421,7 +422,8 @@
 				}
 				
 				//if current page already in memory
-				if (inMemory(Mefmory, current.page) != -1){
+				
+				if (inMemory(Mefmory, current.page, nFrames) != -1){
 					//Remove current.page from Clean/Dirty, whereever it may be
 					struct Page hold;
 					int count = (nFrames/2)+1;
@@ -447,12 +449,13 @@
 				else {
 					//If there is room in memory, place it into any free frame
 					int p;
-					if(inMemory(Mefmory, 0) != -1){
+					if(inMemory(Mefmory, -1, nFrames) != -1){
 						//printf("0 IS IN MEMEORY\n");
 						//Mefmory[inMemory(Mefmory, 0)] = current.page;
 						for(p = 0; p < nFrames; p++){
-							if(Mefmory[p].page == 0){
-								Mefmory[p].page = current.page;
+							if(Mefmory[p].page == -1){
+								//rintf("\n\n Mem is now %x\n\n", current.page);
+								Mefmory[p] = current;
 								break;
 							}
 						}
@@ -471,7 +474,7 @@
 						//Replace frameToEmpty with current
 						for(p = 0; p < nFrames; p++){
 							if(Mefmory[p].page == frameToEmpty.page){
-								Mefmory[p].page = current.page;
+								Mefmory[p] = current;
 								break;
 							}
 						}
@@ -494,7 +497,7 @@
 					printf("\n");
 					printf("Memory:\t\t[");
 					int kl;
-					for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl].page != 0) printf("%x  ", Mefmory[kl].page);
+					for(kl = 0; kl < nFrames; kl++)  printf("%x  ", Mefmory[kl].page);
 					printf("]\n\n");
 				}
 				//Increment readCount
@@ -527,7 +530,7 @@
 						printf("\n");
 						printf("Memory:\t\t[");
 						int kl;
-						for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl].page != 0) printf("%x  ", Mefmory[kl].page);
+						for(kl = 0; kl < nFrames; kl++)  printf("%x  ", Mefmory[kl].page);
 						printf("]\n\n");
 					}
 					continue;
@@ -544,7 +547,9 @@
 				}
 				
 				//if current page already in memory
-				if (inMemory(Mefmory, current.page) != -1){
+				if (inMemory(Mefmory, current.page, nFrames) != -1){
+					
+					
 					//Remove current.page from Clean/Dirty, whereever it may be
 					struct Page hold;
 					int count = (nFrames/2)+1;
@@ -570,11 +575,11 @@
 				else {
 					//If there is room in memory, place it into any free frame
 					int p;
-					if(inMemory(Mefmory, 0) != -1){
+					if(inMemory(Mefmory, -1, nFrames) != -1){
 						//Mefmory[inMemory(Mefmory, 0)] = current.page;
 						for(p = 0; p < nFrames; p++){
-							if(Mefmory[p].page == 0){
-								Mefmory[p].page = current.page;
+							if(Mefmory[p].page == -1){
+								Mefmory[p] = current;
 								break;
 							}
 						}
@@ -586,14 +591,13 @@
 							frameToEmpty = dequeue(Clean);
 						}
 						else {
-							printf("dirty check\n");
 							frameToEmpty = dequeue(Dirty);
 							writeCount++;
 						}
 						//Replace frameToEmpty with current
 						for(p = 0; p < nFrames; p++){
 							if(Mefmory[p].page == frameToEmpty.page){
-								Mefmory[p].page = current.page;
+								Mefmory[p] = current;
 								break;
 							}
 						}
@@ -602,6 +606,7 @@
 				
 				//Print new ram
 				if (debug){
+					printf("writeCount: \t\t%i\n", writeCount);
 					printf("FIFOA:\t\t");
 					printQueue(FIFOA);
 					printf("\n");
@@ -616,7 +621,7 @@
 					printf("\n");
 					printf("Memory:\t\t[");
 					int kl;
-					for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl].page != 0) printf("%x  ", Mefmory[kl].page);
+					for(kl = 0; kl < nFrames; kl++)  printf("%x  ", Mefmory[kl].page);
 					printf("]\n\n");
 				}
 				//Increment readCount
@@ -710,14 +715,16 @@
 		return -1;
 	}
 	//returns spot in memory of searched objects or a -1 if object not found
-	int inMemory(struct Page Mefmory[], unsigned int target){
-		int k;
+	int inMemory(struct Page Mefmory[], unsigned int target, int size){
 		//printf("\n\n");
-		for(k = 0; k < sizeof(Mefmory); k++){
+		while(size){
 			//printf("searching in spot %i\n", Mefmory[k]);
-			if(target == Mefmory[k].page){
-				return k;
+			//printf("Nframes: %i\n", size);
+			//printf("Searching MEMORY: %x\n", Mefmory[size].page);
+			if(target == Mefmory[size].page){
+				return size;
 			}
+			size = size - 1;
 		}		
 		return -1;
 		
