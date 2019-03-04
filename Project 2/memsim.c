@@ -685,6 +685,7 @@
 		int q;
 		int pFront = queue->front;
 		for (q = 0; q < queue->size; q++){
+			//needed?
 			//if (queue->ram[pFront].page == -1 || queue->ram[pFront].page == 0) continue;
 			printf("%x ",queue->ram[pFront].page);
 			pFront = (pFront+1)%queue->capacity;
