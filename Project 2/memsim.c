@@ -313,10 +313,10 @@
 		//Declare main mem queue
 		struct Queue* FIFOA = createQueue(nFrames/2);
 		struct Queue* FIFOB = createQueue(nFrames/2);
-   		struct Queue* Dirty = createQueue((nFrames/2)+1); 
    		struct Queue* Clean = createQueue((nFrames/2)+1); 
+   		struct Queue* Dirty = createQueue((nFrames/2)+1); 
    		struct Queue* Memory = createQueue(nFrames);
-
+		
 		unsigned int Mefmory[nFrames];
 		int val;
 
@@ -588,13 +588,20 @@
 							}
 						}
 					}
-
+					
 					else {
 						struct Page frameToEmpty;
 						if (!isEmpty(Clean)){
+							printf("Before f2e:\t");
+							printQueue(Clean);
+							printf("\n");
 							frameToEmpty = dequeue(Clean);
+							printf("After f2e:\t");
+							printQueue(Clean);
+							printf("\n");
 						}
 						else {
+							printf("dirty check\n");
 							frameToEmpty = dequeue(Dirty);
 							writeCount++;
 						}
