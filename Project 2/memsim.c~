@@ -34,7 +34,7 @@
 	int findQueue(struct Queue* queue, int find);
 	void ageSort(struct Queue* queue, int itemCount);
 	struct Queue *copyQueue(struct Queue *qOne);
-	int inMemory(unsigned int Mefmory[], unsigned int target);
+	int inMemory(struct Page Mefmory[], unsigned int target);
 
 	//Page Replacement Algorithms
 	void fifo();
@@ -129,7 +129,7 @@
 		}
 		
 		//Final Output
-		printf("\ntotal memory frames: %d\n", nFrames);
+		printf("total memory frames: %d\n", nFrames);
 		printf("events in trace: %d\n", eventCount);
 		printf("total disk reads: %d\n", readCount);
 		printf("total disk writes: %d\n", writeCount);
@@ -139,6 +139,7 @@
 	
 	//External replacment algorithms
 	void fifo(){
+		printf("\n");
 		//Read in from file
 		FILE *fp = fopen(file, "r");;
 		if(fp == NULL){
@@ -156,7 +157,7 @@
 		struct Page current;
 		
 		//Reads file addresses and RW's into arrays
-		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF) && (eventCount < 11)){
+		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF) && (eventCount < 30)){
 			//Hold current line from trace
 			int currentPage = address/4096;
 			int currentRW = rw;
@@ -179,20 +180,25 @@
 				if(currentRW == 'W'){
 					int found = findQueue(queue, currentPage);
 					//find place in ram and replace dirty bit
-					if (debug) printf("Dirty bit changed to 1\n\n");
+					if (debug) printf("Dirty bit changed to 1\n");
 					queue->ram[findQueue(queue, currentPage)].isDirty = 1;
 				}
 				eventCount++;
+				if (debug){
+					printf("Queue:\t\t");
+					printQueue(queue);
+					printf("\n\n");
+				}
 				continue;
 			}
 			//If queue is full, dequeue
 			if (isFull(queue)){
 				//Check if isDirty, increment write if true
-				if (debug) printf("RAM Full!\nDequeue:\t%x\n", peekPage(queue));
+				if (debug) printf("Dequeue:\t %x\n", peekPage(queue));
 				int getDirty = peekDirty(queue);
 				if (getDirty == 1){
 					writeCount ++;
-					if (debug) printf("Dirty page removed!\nwriteCount:\t%d\n", writeCount);
+					if (debug) printf("writeCount:\t%d\n", writeCount);
 				}
 				//dequeue front of queue
 				dequeue(queue);
@@ -217,6 +223,7 @@
 	}
 	
 	void lru(){
+		printf("\n");
 		//Read in from file
 		FILE *fp = fopen(file, "r");;
 		if(fp == NULL){
@@ -250,10 +257,10 @@
 			}
 			
 			//CHANGE: %d -> %x
-			if (debug) printf("\n\nCURRENT LINE:\t%x, %c\n", currentPage, currentRW);
+			if (debug) printf("Current Request:%x, %c\n", currentPage, currentRW);
 
 			//Check if page already in Page, flip dirty bit if current line is write
-			if (findQueue(queue, currentPage) != 0){
+			if (findQueue(queue, currentPage) != -1){
 					int found = findQueue(queue, currentPage);
 					queue->ram[found].age = 0;
 					if(currentRW == 'W'){
@@ -263,17 +270,21 @@
 					}
 					ageSort(queue, queue->size);
 					eventCount++;
+					if (debug){
+						printf("Queue:\t\t");
+						printQueue(queue);
+						printf("\n\n");
+					}
 					continue;
 			}
 			//If queue is full, dequeue
 			if (isFull(queue)){
-				if (debug) printf("RAM FULL!\n");
 				//Check if isDirty, increment write if true
 				if (debug) printf("Dequeue:\t%x\n", peekPage(queue));
 				int getDirty = peekDirty(queue);
 				if (getDirty == 1){
 					writeCount ++;
-					if (debug) printf("Dirty page removed!\nwriteCount:\t%d\n", writeCount);
+					if (debug) printf("writeCount:\t%d\n", writeCount);
 				}
 				//dequeue front of queue
 				dequeue(queue);
@@ -282,12 +293,13 @@
 			//Enqueue struct
 			enqueue(queue, current);
 			//Print new ram
-			if (debug) printf("Queue:\t\t");
-			//ageSort(queue, queue->size);
-			
 			ageSort(queue, queue->size);
 			
-			if (debug) printQueue(queue);
+			if (debug){
+				printf("Queue:\t\t");
+				printQueue(queue);
+				printf("\n\n");
+			}
 			//Increment readCount
 			readCount++;
 			//printf("\nreadCount:\t%d", readCount);
@@ -299,7 +311,8 @@
 	}
 	
 	void vms(){
-						//Read in from file
+		printf("\n");
+		//Read in from file
 		FILE *fp = fopen(file, "r");;
 		if(fp == NULL){
 			printf("error");
@@ -313,48 +326,26 @@
 		//Declare main mem queue
 		struct Queue* FIFOA = createQueue(nFrames/2);
 		struct Queue* FIFOB = createQueue(nFrames/2);
-   		struct Queue* Clean = createQueue((nFrames/2)+1); 
-   		struct Queue* Dirty = createQueue((nFrames/2)+1); 
-   		struct Queue* Memory = createQueue(nFrames);
+		struct Queue* Clean = createQueue((nFrames/2)+1); 
+		struct Queue* Dirty = createQueue((nFrames/2)+1); 
+		struct Queue* Memory = createQueue(nFrames);
 		
-		unsigned int Mefmory[nFrames];
+		struct Page Mefmory[nFrames];
 		int val;
 
 		//Initialize all of Memory to 0
-		for(val = 0; val < nFrames; val++) Mefmory[val] = 0;	
+		for(val = 0; val < nFrames; val++) Mefmory[val].page = 0;	
 		//for(val = 0; val < nFrames; val++) printf("memval: %x\n", Mefmory[val]);
 	
 		//Fill FIFOA and FIFOB with null pages
 		struct Page fill;
-		struct Page fill2;
 		fill.page = -1;
-		fill2.page = -1;
 		int f;
 		for (f = 0; f < (nFrames/2); f++){
-			dequeue(FIFOA);
 			enqueue(FIFOA, fill);
-		}
-		FIFOB = copyQueue(FIFOA);
-
-		for (f = 0; f < (nFrames/2); f++){
-			dequeue(FIFOB);
 			enqueue(FIFOB, fill);
 		}
-		
-		//Setup Clean and Dirty
-		for (f = 0; f < (nFrames/2); f++){
-			dequeue(Clean);
-			enqueue(Clean, fill);
-			dequeue(Clean);
-		}
-		Dirty = copyQueue(Clean);
 
-		for (f = 0; f < (nFrames/2); f++){
-			dequeue(Dirty);
-			enqueue(Dirty, fill);
-			dequeue(Dirty);
-		}
-		
 		//Temp to track current trace
 		struct Page current;
 		
@@ -413,7 +404,7 @@
 						printf("\n");
 						printf("Memory:\t\t[");
 						int kl;
-						for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl] != 0) printf("%x  ", Mefmory[kl]);
+						for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl].page != 0) printf("%x  ", Mefmory[kl].page);
 						printf("]\n\n");
 					}
 					continue;
@@ -460,8 +451,8 @@
 						//printf("0 IS IN MEMEORY\n");
 						//Mefmory[inMemory(Mefmory, 0)] = current.page;
 						for(p = 0; p < nFrames; p++){
-							if(Mefmory[p] == 0){
-								Mefmory[p] = current.page;
+							if(Mefmory[p].page == 0){
+								Mefmory[p].page = current.page;
 								break;
 							}
 						}
@@ -479,8 +470,8 @@
 						}
 						//Replace frameToEmpty with current
 						for(p = 0; p < nFrames; p++){
-							if(Mefmory[p] == frameToEmpty.page){
-								Mefmory[p] = current.page;
+							if(Mefmory[p].page == frameToEmpty.page){
+								Mefmory[p].page = current.page;
 								break;
 							}
 						}
@@ -503,7 +494,7 @@
 					printf("\n");
 					printf("Memory:\t\t[");
 					int kl;
-					for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl] != 0) printf("%x  ", Mefmory[kl]);
+					for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl].page != 0) printf("%x  ", Mefmory[kl].page);
 					printf("]\n\n");
 				}
 				//Increment readCount
@@ -536,7 +527,7 @@
 						printf("\n");
 						printf("Memory:\t\t[");
 						int kl;
-						for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl] != 0) printf("%x  ", Mefmory[kl]);
+						for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl].page != 0) printf("%x  ", Mefmory[kl].page);
 						printf("]\n\n");
 					}
 					continue;
@@ -582,23 +573,17 @@
 					if(inMemory(Mefmory, 0) != -1){
 						//Mefmory[inMemory(Mefmory, 0)] = current.page;
 						for(p = 0; p < nFrames; p++){
-							if(Mefmory[p] == 0){
-								Mefmory[p] = current.page;
+							if(Mefmory[p].page == 0){
+								Mefmory[p].page = current.page;
 								break;
 							}
 						}
 					}
-
+					
 					else {
 						struct Page frameToEmpty;
 						if (!isEmpty(Clean)){
-							printf("Before f2e:\t");
-							printQueue(Clean);
-							printf("\n");
 							frameToEmpty = dequeue(Clean);
-							printf("After f2e:\t");
-							printQueue(Clean);
-							printf("\n");
 						}
 						else {
 							printf("dirty check\n");
@@ -607,8 +592,8 @@
 						}
 						//Replace frameToEmpty with current
 						for(p = 0; p < nFrames; p++){
-							if(Mefmory[p] == frameToEmpty.page){
-								Mefmory[p] = current.page;
+							if(Mefmory[p].page == frameToEmpty.page){
+								Mefmory[p].page = current.page;
 								break;
 							}
 						}
@@ -631,7 +616,7 @@
 					printf("\n");
 					printf("Memory:\t\t[");
 					int kl;
-					for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl] != 0) printf("%x  ", Mefmory[kl]);
+					for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl].page != 0) printf("%x  ", Mefmory[kl].page);
 					printf("]\n\n");
 				}
 				//Increment readCount
@@ -652,7 +637,8 @@
 		queue->capacity = capacity; 
 		queue->front = queue->size = 0;  
 		queue->rear = capacity - 1;
-		queue->ram = (struct Page*) malloc(queue->capacity); 
+		queue->ram = (struct Page*) malloc(queue->capacity * sizeof(struct Page)); 
+
 		return queue; 
 	}
 	
@@ -700,40 +686,20 @@
 		return queue->ram[queue->front].isDirty;
 	}
 	
-	
 	//CHANGE: %d -> %x
 	void printQueue(struct Queue* queue){
-		int q;
 		printf("[");
-		if (queue->front == queue->rear+1){
-			for (q = queue->front; q < queue->capacity; q++){
-				if (queue->ram[q].page == -1 || queue->ram[q].page == 0) continue;
-				printf("%x ",queue->ram[q].page);
-				if (strcmp(algo, "lru")== 0){
-					printf("%i ", queue->ram[q].age);
-				}
-			}
-			
-			for (q = 0; q < queue->rear+1; q++){
-				if (queue->ram[q].page == -1 || queue->ram[q].page == 0) continue;
-				printf("%x ",queue->ram[q].page);
-				if (strcmp(algo, "lru")== 0){
-					printf("%i ", queue->ram[q].age);
-				}
-			}
-		}
-		else{
-			for (q = queue->front; q < queue->rear+1; q++){
-				if (queue->ram[q].page == -1 || queue->ram[q].page == 0) continue;
-				printf("%x ",queue->ram[q].page);
-				if (strcmp(algo, "lru")== 0){
-					printf("%i ", queue->ram[q].age);
-				}
-			}
+		int q;
+		int pFront = queue->front;
+		for (q = 0; q < queue->size; q++){
+			//needed?
+			//if (queue->ram[pFront].page == -1 || queue->ram[pFront].page == 0) continue;
+			printf("%x ",queue->ram[pFront].page);
+			pFront = (pFront+1)%queue->capacity;
 		}
 		printf("]");
 	}
-	
+
 	int findQueue(struct Queue* queue, int find){
 		int q;
 		for (q = 0; q < queue->capacity; q++){
@@ -744,12 +710,12 @@
 		return -1;
 	}
 	//returns spot in memory of searched objects or a -1 if object not found
-	int inMemory(unsigned int Mefmory[], unsigned int target){
+	int inMemory(struct Page Mefmory[], unsigned int target){
 		int k;
 		//printf("\n\n");
 		for(k = 0; k < sizeof(Mefmory); k++){
 			//printf("searching in spot %i\n", Mefmory[k]);
-			if(target == Mefmory[k]){
+			if(target == Mefmory[k].page){
 				return k;
 			}
 		}		

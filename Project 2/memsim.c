@@ -129,7 +129,7 @@
 		}
 		
 		//Final Output
-		printf("\ntotal memory frames: %d\n", nFrames);
+		printf("total memory frames: %d\n", nFrames);
 		printf("events in trace: %d\n", eventCount);
 		printf("total disk reads: %d\n", readCount);
 		printf("total disk writes: %d\n", writeCount);
@@ -139,6 +139,7 @@
 	
 	//External replacment algorithms
 	void fifo(){
+		printf("\n");
 		//Read in from file
 		FILE *fp = fopen(file, "r");;
 		if(fp == NULL){
@@ -156,7 +157,7 @@
 		struct Page current;
 		
 		//Reads file addresses and RW's into arrays
-		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF) && (eventCount < 11)){
+		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF) && (eventCount < 30)){
 			//Hold current line from trace
 			int currentPage = address/4096;
 			int currentRW = rw;
@@ -179,20 +180,25 @@
 				if(currentRW == 'W'){
 					int found = findQueue(queue, currentPage);
 					//find place in ram and replace dirty bit
-					if (debug) printf("Dirty bit changed to 1\n\n");
+					if (debug) printf("Dirty bit changed to 1\n");
 					queue->ram[findQueue(queue, currentPage)].isDirty = 1;
 				}
 				eventCount++;
+				if (debug){
+					printf("Queue:\t\t");
+					printQueue(queue);
+					printf("\n\n");
+				}
 				continue;
 			}
 			//If queue is full, dequeue
 			if (isFull(queue)){
 				//Check if isDirty, increment write if true
-				if (debug) printf("RAM Full!\nDequeue:\t%x\n", peekPage(queue));
+				if (debug) printf("Dequeue:\t %x\n", peekPage(queue));
 				int getDirty = peekDirty(queue);
 				if (getDirty == 1){
 					writeCount ++;
-					if (debug) printf("Dirty page removed!\nwriteCount:\t%d\n", writeCount);
+					if (debug) printf("writeCount:\t%d\n", writeCount);
 				}
 				//dequeue front of queue
 				dequeue(queue);
@@ -217,6 +223,7 @@
 	}
 	
 	void lru(){
+		printf("\n");
 		//Read in from file
 		FILE *fp = fopen(file, "r");;
 		if(fp == NULL){
@@ -250,10 +257,10 @@
 			}
 			
 			//CHANGE: %d -> %x
-			if (debug) printf("\n\nCURRENT LINE:\t%x, %c\n", currentPage, currentRW);
+			if (debug) printf("Current Request:%x, %c\n", currentPage, currentRW);
 
 			//Check if page already in Page, flip dirty bit if current line is write
-			if (findQueue(queue, currentPage) != 0){
+			if (findQueue(queue, currentPage) != -1){
 					int found = findQueue(queue, currentPage);
 					queue->ram[found].age = 0;
 					if(currentRW == 'W'){
@@ -263,17 +270,21 @@
 					}
 					ageSort(queue, queue->size);
 					eventCount++;
+					if (debug){
+						printf("Queue:\t\t");
+						printQueue(queue);
+						printf("\n\n");
+					}
 					continue;
 			}
 			//If queue is full, dequeue
 			if (isFull(queue)){
-				if (debug) printf("RAM FULL!\n");
 				//Check if isDirty, increment write if true
 				if (debug) printf("Dequeue:\t%x\n", peekPage(queue));
 				int getDirty = peekDirty(queue);
 				if (getDirty == 1){
 					writeCount ++;
-					if (debug) printf("Dirty page removed!\nwriteCount:\t%d\n", writeCount);
+					if (debug) printf("writeCount:\t%d\n", writeCount);
 				}
 				//dequeue front of queue
 				dequeue(queue);
@@ -282,12 +293,13 @@
 			//Enqueue struct
 			enqueue(queue, current);
 			//Print new ram
-			if (debug) printf("Queue:\t\t");
-			//ageSort(queue, queue->size);
-			
 			ageSort(queue, queue->size);
 			
-			if (debug) printQueue(queue);
+			if (debug){
+				printf("Queue:\t\t");
+				printQueue(queue);
+				printf("\n\n");
+			}
 			//Increment readCount
 			readCount++;
 			//printf("\nreadCount:\t%d", readCount);
@@ -299,7 +311,8 @@
 	}
 	
 	void vms(){
-						//Read in from file
+		printf("\n");
+		//Read in from file
 		FILE *fp = fopen(file, "r");;
 		if(fp == NULL){
 			printf("error");
@@ -570,13 +583,7 @@
 					else {
 						struct Page frameToEmpty;
 						if (!isEmpty(Clean)){
-							printf("Before f2e:\t");
-							printQueue(Clean);
-							printf("\n");
 							frameToEmpty = dequeue(Clean);
-							printf("After f2e:\t");
-							printQueue(Clean);
-							printf("\n");
 						}
 						else {
 							printf("dirty check\n");
