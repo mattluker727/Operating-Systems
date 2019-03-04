@@ -33,7 +33,8 @@
 	void printQueue(struct Queue* queue);
 	int findQueue(struct Queue* queue, int find);
 	void ageSort(struct Queue* queue, int itemCount);
-	void copyQueue(struct Queue *qOne, struct Queue *qTwo);
+	struct Queue *copyQueue(struct Queue *qOne);
+	int inMemory(unsigned int Mefmory[], unsigned int target);
 
 	//Page Replacement Algorithms
 	void fifo();
@@ -175,7 +176,6 @@
 
 			//Check if page already in Page, flip dirty bit if current line is write
 			if (findQueue(queue, currentPage) != -1){
-				if (debug) printf("Already in RAM!\n");
 				if(currentRW == 'W'){
 					int found = findQueue(queue, currentPage);
 					//find place in ram and replace dirty bit
@@ -254,7 +254,6 @@
 
 			//Check if page already in Page, flip dirty bit if current line is write
 			if (findQueue(queue, currentPage) != 0){
-					if (debug) printf("Already in RAM!");
 					int found = findQueue(queue, currentPage);
 					queue->ram[found].age = 0;
 					if(currentRW == 'W'){
@@ -313,31 +312,43 @@
 		
 		//Declare main mem queue
 		struct Queue* FIFOA = createQueue(nFrames/2);
-		printQueue(FIFOA);
-		printf("\n");
 		struct Queue* FIFOB = createQueue(nFrames/2);
-		printQueue(FIFOB);
-		printf("\n");
    		struct Queue* Clean = createQueue((nFrames/2)+1); 
    		struct Queue* Dirty = createQueue((nFrames/2)+1); 
    		struct Queue* Memory = createQueue(nFrames);
-		
-		//Fill FIFOA with null pages
+
+		unsigned int Mefmory[nFrames];
+		int val;
+
+		//Initialize all of Memory to 0
+		for(val = 0; val < nFrames; val++) Mefmory[val] = 0;	
+		//for(val = 0; val < nFrames; val++) printf("memval: %x\n", Mefmory[val]);
+	
+		//Fill FIFOA and FIFOB with null pages
 		struct Page fill;
+		struct Page fill2;
 		fill.page = -1;
+		fill2.page = -1;
 		int f;
 		for (f = 0; f < (nFrames/2); f++){
-			printf("FIFOA: ");
 			dequeue(FIFOA);
 			enqueue(FIFOA, fill);
-			printQueue(FIFOA);
-			printf("\n");
 		}
-		copyQueue(FIFOA, FIFOB);
-		printf("FIFOB: ");
-		printQueue(FIFOB);
-		printf("\n");
-		printf("here\n");
+		FIFOB = copyQueue(FIFOA);
+
+		for (f = 0; f < (nFrames/2); f++){
+			dequeue(FIFOB);
+			enqueue(FIFOB, fill);
+		}
+		
+		
+		//printf("FIFOB: ");
+		//dequeue(FIFOB);
+		//enqueue(FIFOB, fill);
+		//printQueue(FIFOB);
+		//printf("\n");
+		Dirty = copyQueue(Clean);
+
 
 		//Temp to track current trace
 		struct Page current;
@@ -371,25 +382,41 @@
 			//Assign current page to team
 			current.isTeamA = false;
 			if (check3 == 3) current.isTeamA = true;
-			printf("current.isTeamA: %d\n", current.isTeamA);
+			//printf("current.isTeamA: %d\n", current.isTeamA);
 			
 			if (current.isTeamA){
 				//Check if new page already in FIFO(current), flip dirty bit if current line is write
 				if (findQueue(FIFOA, current.page) != -1){
-					if (debug) printf("Already in RAM!\n");
 					if(currentRW == 'W'){
 						int found = findQueue(FIFOA, currentPage);
 						//find place in ram and replace dirty bit
-						if (debug) printf("Dirty bit changed to 1\n\n");
 						FIFOA->ram[findQueue(FIFOA, currentPage)].isDirty = 1;
 					}
 					eventCount++;
+					if (debug){
+						printf("FIFOA:\t\t");
+						printQueue(FIFOA);
+						printf("\n");
+						printf("FIFOB:\t\t");
+						printQueue(FIFOB);
+						printf("\n");
+						printf("Clean:\t\t");
+						printQueue(Clean);
+						printf("\n");
+						printf("Dirty:\t\t");
+						printQueue(Dirty);
+						printf("\n");
+						printf("Memory:\t\t[");
+						int kl;
+						for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl] != 0) printf("%x  ", Mefmory[kl]);
+						printf("]\n\n");
+					}
 					continue;
 				}
 				//else:
 				//page_out = insert new page into the FIFO of the current process;
 				struct Page pageOut = dequeue(FIFOA);
-				if (debug) printf("RAM Full!\nDequeue:\t%x\n", pageOut);
+				//if (debug) printf("RAM Full!\nDequeue:\t%x\n", pageOut);
 				enqueue(FIFOA, current);
 				
 				if (pageOut.page != -1){
@@ -398,38 +425,49 @@
 				}
 				
 				//if current page already in memory
-				if (findQueue(Memory, current.page) != -1){
+				if (inMemory(Mefmory, current.page) != -1){
 					//Remove current.page from Clean/Dirty, whereever it may be
 					struct Page hold;
 					int count = (nFrames/2)+1;
 					if (findQueue(Clean, current.page) != -1){
 						while(count){
 							hold = dequeue(Clean);
-							if (hold.page == current.page){
-								count = count - 1;
-								continue;
+							if (hold.page != current.page){
+								enqueue(Dirty, hold);
 							}
-							enqueue(Clean, hold);
 							count = count - 1;
 						}
 					}
 					else{
 						while(count){
+							printf("Count %i\n", count);
+							printQueue(Dirty);
+							printf("\n");
 							hold = dequeue(Dirty);
-							if (hold.page == current.page){
-								count = count - 1;
-								continue;
+							printf("hold: %x\n", hold.page);
+							printQueue(Dirty);
+							printf("\n\n");
+							if (hold.page != current.page){
+								enqueue(Dirty, hold);
 							}
-							enqueue(Dirty, hold);
 							count = count - 1;
 						}
 					}
 				}
 				else {
 					//If there is room in memory, place it into any free frame
-					if (!isFull(Memory)){
-						enqueue(Memory, current);
+					int p;
+					if(inMemory(Mefmory, 0) != -1){
+						//printf("0 IS IN MEMEORY\n");
+						//Mefmory[inMemory(Mefmory, 0)] = current.page;
+						for(p = 0; p < nFrames; p++){
+							if(Mefmory[p] == 0){
+								Mefmory[p] = current.page;
+								break;
+							}
+						}
 					}
+
 					else {
 						struct Page frameToEmpty;
 						if (!isEmpty(Clean)){
@@ -438,10 +476,15 @@
 						else {
 							frameToEmpty = dequeue(Dirty);
 							writeCount++;
-							if (debug) printf("Dirty page removed!\nwriteCount:\t%d\n", writeCount);
+							//if (debug) printf("Dirty page removed!\nwriteCount:\t%d\n", writeCount);
 						}
 						//Replace frameToEmpty with current
-						Memory->ram[findQueue(Memory, frameToEmpty.page)] = current;
+						for(p = 0; p < nFrames; p++){
+							if(Mefmory[p] == frameToEmpty.page){
+								Mefmory[p] = current.page;
+								break;
+							}
+						}
 					}
 				}
 				
@@ -459,32 +502,50 @@
 					printf("Dirty:\t\t");
 					printQueue(Dirty);
 					printf("\n");
-					printf("Memory:\t\t");
-					printQueue(Memory);
-					printf("\n\n");
+					printf("Memory:\t\t[");
+					int kl;
+					for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl] != 0) printf("%x  ", Mefmory[kl]);
+					printf("]\n\n");
 				}
 				//Increment readCount
 				readCount++;
 				//printf("\nreadCount:\t%d", readCount);
 				eventCount++;
 			}
+			//FIFO B
 			else {
-								//Check if new page already in FIFO(current), flip dirty bit if current line is write
+				//Check if new page already in FIFO(current), flip dirty bit if current line is write
 				if (findQueue(FIFOB, current.page) != -1){
-					if (debug) printf("Already in RAM!\n");
 					if(currentRW == 'W'){
 						int found = findQueue(FIFOB, currentPage);
 						//find place in ram and replace dirty bit
-						if (debug) printf("Dirty bit changed to 1\n\n");
 						FIFOB->ram[findQueue(FIFOB, currentPage)].isDirty = 1;
 					}
 					eventCount++;
+					if (debug){
+						printf("FIFOA:\t\t");
+						printQueue(FIFOA);
+						printf("\n");
+						printf("FIFOB:\t\t");
+						printQueue(FIFOB);
+						printf("\n");
+						printf("Clean:\t\t");
+						printQueue(Clean);
+						printf("\n");
+						printf("Dirty:\t\t");
+						printQueue(Dirty);
+						printf("\n");
+						printf("Memory:\t\t[");
+						int kl;
+						for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl] != 0) printf("%x  ", Mefmory[kl]);
+						printf("]\n\n");
+					}
 					continue;
 				}
 				//else:
 				//page_out = insert new page into the FIFO of the current process;
 				struct Page pageOut = dequeue(FIFOB);
-				if (debug) printf("RAM Full!\nDequeue:\t%x\n", pageOut);
+				//if (debug) printf("RAM Full!\nDequeue:\t%x\n", pageOut);
 				enqueue(FIFOB, current);
 				
 				if (pageOut.page != -1){
@@ -493,38 +554,42 @@
 				}
 				
 				//if current page already in memory
-				if (findQueue(Memory, current.page) != -1){
+				if (inMemory(Mefmory, current.page) != -1){
 					//Remove current.page from Clean/Dirty, whereever it may be
 					struct Page hold;
 					int count = (nFrames/2)+1;
 					if (findQueue(Clean, current.page) != -1){
 						while(count){
 							hold = dequeue(Clean);
-							if (hold.page == current.page){
-								count = count - 1;
-								continue;
+							if (hold.page != current.page){
+								enqueue(Dirty, hold);
 							}
-							enqueue(Clean, hold);
 							count = count - 1;
 						}
 					}
 					else{
 						while(count){
 							hold = dequeue(Dirty);
-							if (hold.page == current.page){
-								count = count - 1;
-								continue;
+							if (hold.page != current.page){
+								enqueue(Dirty, hold);
 							}
-							enqueue(Dirty, hold);
 							count = count - 1;
 						}
 					}
 				}
 				else {
 					//If there is room in memory, place it into any free frame
-					if (!isFull(Memory)){
-						enqueue(Memory, current);
+					int p;
+					if(inMemory(Mefmory, 0) != -1){
+						//Mefmory[inMemory(Mefmory, 0)] = current.page;
+						for(p = 0; p < nFrames; p++){
+							if(Mefmory[p] == 0){
+								Mefmory[p] = current.page;
+								break;
+							}
+						}
 					}
+
 					else {
 						struct Page frameToEmpty;
 						if (!isEmpty(Clean)){
@@ -533,10 +598,14 @@
 						else {
 							frameToEmpty = dequeue(Dirty);
 							writeCount++;
-							if (debug) printf("Dirty page removed!\nwriteCount:\t%d\n", writeCount);
 						}
 						//Replace frameToEmpty with current
-						Memory->ram[findQueue(Memory, frameToEmpty.page)] = current;
+						for(p = 0; p < nFrames; p++){
+							if(Mefmory[p] == frameToEmpty.page){
+								Mefmory[p] = current.page;
+								break;
+							}
+						}
 					}
 				}
 				
@@ -554,9 +623,10 @@
 					printf("Dirty:\t\t");
 					printQueue(Dirty);
 					printf("\n");
-					printf("Memory:\t\t");
-					printQueue(Memory);
-					printf("\n\n");
+					printf("Memory:\t\t[");
+					int kl;
+					for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl] != 0) printf("%x  ", Mefmory[kl]);
+					printf("]\n\n");
 				}
 				//Increment readCount
 				readCount++;
@@ -628,8 +698,10 @@
 	//CHANGE: %d -> %x
 	void printQueue(struct Queue* queue){
 		int q;
+		printf("[");
 		if (queue->front == queue->rear+1){
 			for (q = queue->front; q < queue->capacity; q++){
+				if (queue->ram[q].page == -1 || queue->ram[q].page == 0) continue;
 				printf("%x ",queue->ram[q].page);
 				if (strcmp(algo, "lru")== 0){
 					printf("%i ", queue->ram[q].age);
@@ -637,6 +709,7 @@
 			}
 			
 			for (q = 0; q < queue->rear+1; q++){
+				if (queue->ram[q].page == -1 || queue->ram[q].page == 0) continue;
 				printf("%x ",queue->ram[q].page);
 				if (strcmp(algo, "lru")== 0){
 					printf("%i ", queue->ram[q].age);
@@ -645,13 +718,14 @@
 		}
 		else{
 			for (q = queue->front; q < queue->rear+1; q++){
+				if (queue->ram[q].page == -1 || queue->ram[q].page == 0) continue;
 				printf("%x ",queue->ram[q].page);
 				if (strcmp(algo, "lru")== 0){
 					printf("%i ", queue->ram[q].age);
 				}
 			}
-
 		}
+		printf("]");
 	}
 	
 	int findQueue(struct Queue* queue, int find){
@@ -663,7 +737,19 @@
 		}
 		return -1;
 	}
-
+	//returns spot in memory of searched objects or a -1 if object not found
+	int inMemory(unsigned int Mefmory[], unsigned int target){
+		int k;
+		//printf("\n\n");
+		for(k = 0; k < sizeof(Mefmory); k++){
+			//printf("searching in spot %i\n", Mefmory[k]);
+			if(target == Mefmory[k]){
+				return k;
+			}
+		}		
+		return -1;
+		
+	}
 	void ageSort(struct Queue* queue, int itemCount){
 		
 		int i, j;
@@ -695,12 +781,15 @@
 		}
 	}
 	
-	void copyQueue(struct Queue *qOne, struct Queue *qTwo){
+	struct Queue *copyQueue(struct Queue *qOne){
+		struct Queue *qTwo = createQueue(nFrames/2);;
 		qTwo->capacity = qOne->capacity; 
 		qTwo->front = qOne->front;
 		qTwo->size = qOne->size;  
 		qTwo->rear = qOne->capacity - 1;
 		qTwo->ram = (struct Page*) malloc(qOne->capacity); 
+		//printQueue(qTwo);
+		return qTwo;
 	}
 
   //End queue functions
