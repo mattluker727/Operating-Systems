@@ -34,7 +34,7 @@
 	int findQueue(struct Queue* queue, int find);
 	void ageSort(struct Queue* queue, int itemCount);
 	struct Queue *copyQueue(struct Queue *qOne);
-	int inMemory(unsigned int Mefmory[], unsigned int target);
+	int inMemory(struct Page Mefmory[], unsigned int target);
 
 	//Page Replacement Algorithms
 	void fifo();
@@ -317,11 +317,11 @@
 		struct Queue* Dirty = createQueue((nFrames/2)+1); 
 		struct Queue* Memory = createQueue(nFrames);
 		
-		unsigned int Mefmory[nFrames];
+		struct Page Mefmory[nFrames];
 		int val;
 
 		//Initialize all of Memory to 0
-		for(val = 0; val < nFrames; val++) Mefmory[val] = 0;	
+		for(val = 0; val < nFrames; val++) Mefmory[val].page = 0;	
 		//for(val = 0; val < nFrames; val++) printf("memval: %x\n", Mefmory[val]);
 	
 		//Fill FIFOA and FIFOB with null pages
@@ -391,7 +391,7 @@
 						printf("\n");
 						printf("Memory:\t\t[");
 						int kl;
-						for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl] != 0) printf("%x  ", Mefmory[kl]);
+						for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl].page != 0) printf("%x  ", Mefmory[kl].page);
 						printf("]\n\n");
 					}
 					continue;
@@ -438,8 +438,8 @@
 						//printf("0 IS IN MEMEORY\n");
 						//Mefmory[inMemory(Mefmory, 0)] = current.page;
 						for(p = 0; p < nFrames; p++){
-							if(Mefmory[p] == 0){
-								Mefmory[p] = current.page;
+							if(Mefmory[p].page == 0){
+								Mefmory[p].page = current.page;
 								break;
 							}
 						}
@@ -457,8 +457,8 @@
 						}
 						//Replace frameToEmpty with current
 						for(p = 0; p < nFrames; p++){
-							if(Mefmory[p] == frameToEmpty.page){
-								Mefmory[p] = current.page;
+							if(Mefmory[p].page == frameToEmpty.page){
+								Mefmory[p].page = current.page;
 								break;
 							}
 						}
@@ -481,7 +481,7 @@
 					printf("\n");
 					printf("Memory:\t\t[");
 					int kl;
-					for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl] != 0) printf("%x  ", Mefmory[kl]);
+					for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl].page != 0) printf("%x  ", Mefmory[kl].page);
 					printf("]\n\n");
 				}
 				//Increment readCount
@@ -514,7 +514,7 @@
 						printf("\n");
 						printf("Memory:\t\t[");
 						int kl;
-						for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl] != 0) printf("%x  ", Mefmory[kl]);
+						for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl].page != 0) printf("%x  ", Mefmory[kl].page);
 						printf("]\n\n");
 					}
 					continue;
@@ -560,8 +560,8 @@
 					if(inMemory(Mefmory, 0) != -1){
 						//Mefmory[inMemory(Mefmory, 0)] = current.page;
 						for(p = 0; p < nFrames; p++){
-							if(Mefmory[p] == 0){
-								Mefmory[p] = current.page;
+							if(Mefmory[p].page == 0){
+								Mefmory[p].page = current.page;
 								break;
 							}
 						}
@@ -585,8 +585,8 @@
 						}
 						//Replace frameToEmpty with current
 						for(p = 0; p < nFrames; p++){
-							if(Mefmory[p] == frameToEmpty.page){
-								Mefmory[p] = current.page;
+							if(Mefmory[p].page == frameToEmpty.page){
+								Mefmory[p].page = current.page;
 								break;
 							}
 						}
@@ -609,7 +609,7 @@
 					printf("\n");
 					printf("Memory:\t\t[");
 					int kl;
-					for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl] != 0) printf("%x  ", Mefmory[kl]);
+					for(kl = 0; kl < nFrames; kl++) if (Mefmory[kl].page != 0) printf("%x  ", Mefmory[kl].page);
 					printf("]\n\n");
 				}
 				//Increment readCount
@@ -703,12 +703,12 @@
 		return -1;
 	}
 	//returns spot in memory of searched objects or a -1 if object not found
-	int inMemory(unsigned int Mefmory[], unsigned int target){
+	int inMemory(struct Page Mefmory[], unsigned int target){
 		int k;
 		//printf("\n\n");
 		for(k = 0; k < sizeof(Mefmory); k++){
 			//printf("searching in spot %i\n", Mefmory[k]);
-			if(target == Mefmory[k]){
+			if(target == Mefmory[k].page){
 				return k;
 			}
 		}		
