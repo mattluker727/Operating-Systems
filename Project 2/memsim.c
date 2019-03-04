@@ -326,35 +326,13 @@
 	
 		//Fill FIFOA and FIFOB with null pages
 		struct Page fill;
-		struct Page fill2;
 		fill.page = -1;
-		fill2.page = -1;
 		int f;
 		for (f = 0; f < (nFrames/2); f++){
-			dequeue(FIFOA);
 			enqueue(FIFOA, fill);
-		}
-		//FIFOB = copyQueue(FIFOA);
-
-		for (f = 0; f < (nFrames/2); f++){
-			dequeue(FIFOB);
 			enqueue(FIFOB, fill);
 		}
-		
-		//Setup Clean and Dirty
-		// for (f = 0; f < (nFrames/2); f++){
-		// 	dequeue(Clean);
-		// 	enqueue(Clean, fill);
-		// 	dequeue(Clean);
-		// }
-		// Dirty = copyQueue(Clean);
 
-		// for (f = 0; f < (nFrames/2); f++){
-		// 	dequeue(Dirty);
-		// 	enqueue(Dirty, fill);
-		// 	dequeue(Dirty);
-		// }
-		
 		//Temp to track current trace
 		struct Page current;
 		
