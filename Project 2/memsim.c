@@ -679,10 +679,8 @@
 		return queue->ram[queue->front].isDirty;
 	}
 	
-	
 	//CHANGE: %d -> %x
 	void printQueue(struct Queue* queue){
-		printf("current queue size: %d, current front point: %d", queue->size, queue->front);
 		printf("[");
 		int q;
 		int pFront = queue->front;
@@ -693,7 +691,7 @@
 		}
 		printf("]");
 	}
-	
+
 	int findQueue(struct Queue* queue, int find){
 		int q;
 		for (q = 0; q < queue->capacity; q++){
