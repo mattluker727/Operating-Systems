@@ -350,7 +350,7 @@
 		struct Page current;
 		
 		//Reads file addresses and RW's into arrays
-		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF )){
+		while ((fscanf(fp, "%x %c\n", &address, &rw) != EOF)){
 			//Hold current line from trace
 			int currentPage = address/4096;
 			int currentRW = rw;
@@ -431,7 +431,7 @@
 						while(count){
 							hold = dequeue(Clean);
 							if (hold.page != current.page){
-								enqueue(Dirty, hold);
+								enqueue(Clean, hold);
 							}
 							count = count - 1;
 						}
@@ -549,7 +549,6 @@
 				//if current page already in memory
 				if (inMemory(Mefmory, current.page, nFrames) != -1){
 					
-					
 					//Remove current.page from Clean/Dirty, whereever it may be
 					struct Page hold;
 					int count = (nFrames/2)+1;
@@ -557,12 +556,13 @@
 						while(count){
 							hold = dequeue(Clean);
 							if (hold.page != current.page){
-								enqueue(Dirty, hold);
+								enqueue(Clean, hold);
 							}
 							count = count - 1;
 						}
 					}
 					else{
+
 						while(count){
 							hold = dequeue(Dirty);
 							if (hold.page != current.page){
@@ -718,7 +718,7 @@
 	int inMemory(struct Page Mefmory[], unsigned int target, int size){
 		//printf("\n\n");
 		while(size > -1){
-			printf("searching for %x against %x\n",target, Mefmory[size].page);
+			//printf("searching for %x against %x\n",target, Mefmory[size].page);
 			//printf("Nframes: %i\n", size);
 			//printf("Searching MEMORY: %x\n", Mefmory[size].page);
 			if(target == Mefmory[size].page){
