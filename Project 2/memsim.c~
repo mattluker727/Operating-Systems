@@ -717,8 +717,8 @@
 	//returns spot in memory of searched objects or a -1 if object not found
 	int inMemory(struct Page Mefmory[], unsigned int target, int size){
 		//printf("\n\n");
-		while(size){
-			//printf("searching in spot %i\n", Mefmory[k]);
+		while(size > -1){
+			printf("searching for %x against %x\n",target, Mefmory[size].page);
 			//printf("Nframes: %i\n", size);
 			//printf("Searching MEMORY: %x\n", Mefmory[size].page);
 			if(target == Mefmory[size].page){
