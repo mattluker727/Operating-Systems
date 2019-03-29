@@ -71,12 +71,8 @@
 			
 			//Check that nrames is an int
 			if (isNumber(argv[2])) {
-				//max input = 25, min = 
 				nFrames = atoi(argv[2]);
-				//if (nFrames > 25) nFrames = 25;
-				//double test = pow(2, nFrames);
-				//printf("%lf\n", test);
-				//nFrames = (int)test;
+				//nFrames= pow(2, nFrames);
 
 			}
 			else {
