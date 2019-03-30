@@ -195,9 +195,22 @@ int interface(void * cube_ref) {
 
       }
     }
-
+		
 	  else if (!strcmp(command, "s")){
-		printf("step\n");
+		int randomBit = rand() % 2;
+		printf("%i\n", randomBit);
+
+		if(randomBit == 0){
+			randomBit = rand() % cube->teamA_size;
+			wizard_func(cube->teamA_wizards[randomBit]);
+		}
+		else{
+			randomBit = rand() % cube->teamB_size;
+			printf("rand bit %i team size %i\n", randomBit, cube->teamB_size);
+			wizard_func(cube->teamB_wizards[randomBit]);
+		}
+
+		//for(i = 0; i < sizeof(cube->teamB_size); i++) printf("step %i\n", i);
 	}
 	  else if (!strcmp(command, "c")){
 		printf("complete\n");
