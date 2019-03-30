@@ -8,19 +8,18 @@
 #include "cube.h"
 #include "wizard.h"
 
-void *
-  wizard_func(void * wizard_descr) {
+void * wizard_func(void * wizard_descr) {
     struct cube * cube;
     struct room * newroom;
     struct room * oldroom;
     struct wizard * self;
     struct wizard * other;
-
+		
     self = (struct wizard * ) wizard_descr;
     assert(self);
     cube = self->cube;
     assert(cube);
-
+		
     /* Sets starting room */
     oldroom = cube->rooms[self->x][self->y];
     assert(oldroom);
