@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <stdbool.h>
 
 #include "cube.h"
 #include "wizard.h"
@@ -28,13 +29,39 @@ void command_line_usage() {
 void kill_wizards(struct wizard * w) {
 
   /* Fill in */
+	
 
   return;
 }
 
 int check_winner(struct cube * cube) {
-
+	
   /* Fill in */
+	bool aWin = false;
+	bool bWin = false;
+	int i;
+
+	//Check if all members of teamA are frozen
+	for (i = 0; i < cube->teamA_size; i++){
+		printf("i: %d\n", i);
+		printf("status: %d\n", cube->teamA_wizards[i]->status);
+		if (cube->teamA_wizards[i]->status == 0 ) break;
+		//If all members of teamA were frozen, team b Wins
+		if (i = cube->teamA_size - 1) bWin = true;
+	}
+
+	//Check if all members of teamB are frozen
+	for (i = 0; i < cube->teamB_size; i++){
+		printf("i: %d\n", i);
+		printf("status: %d\n", cube->teamA_wizards[i]->status);
+		if (cube->teamB_wizards[i]->status == 0 ) break;
+		//If all members of teamB were frozen, team a Wins
+		if (i = cube->teamB_size - 1) aWin = true;
+	}
+
+	//Print results
+	printf("Did teamA win?: %s\n", aWin ? "true" : "false");
+	printf("Did teamB win?: %s\n", bWin ? "true" : "false");
 
   return 0;
 }
@@ -192,6 +219,7 @@ int interface(void * cube_ref) {
         /* Start the game */
 
         /* Fill in */
+				check_winner(cube);
 
       }
     }
