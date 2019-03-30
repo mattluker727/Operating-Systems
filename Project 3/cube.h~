@@ -1,4 +1,4 @@
-//definitions for the cube, rooms, and wizards. You can only add the needed thread-related variables to these efinitions. 
+//definitions for the cube, rooms, and wizards. You can only add the needed thread-related variables to these definitions. 
 
 #ifndef _CUBE_H
 #define _CUBE_H
