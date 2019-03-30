@@ -195,6 +195,16 @@ int interface(void * cube_ref) {
 
       }
     }
+
+	  else if (!strcmp(command, "s")){
+		printf("step\n");
+	}
+	  else if (!strcmp(command, "c")){
+		printf("complete\n");
+	}
+
+
+
 		else if (!strcmp(command, "stop")) {
       /* Stop the game */
       return 1;
