@@ -506,9 +506,9 @@ int fight_wizard(struct wizard * self, struct wizard * other, struct room * room
     printf("Wizard %c%d in room (%d,%d) freezes enemy %c%d\n",
       self->team, self->id, room->x, room->y,
       other->team, other->id);
-
+		
     /* Fill in */
-		kill_wizards(other);	//freeze other
+		other->status = 1;	//freeze other
   }
 
   /* Self freezes and release the lock */
@@ -519,7 +519,7 @@ int fight_wizard(struct wizard * self, struct wizard * other, struct room * room
       other->team, other->id);
 
     /* Fill in */
-		kill_wizards(self);	//freeze self
+		self->status = 1;	//freeze self
 		
     return 1;
   }
