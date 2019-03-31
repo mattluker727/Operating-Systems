@@ -29,8 +29,8 @@ void command_line_usage() {
 void kill_wizards(struct wizard * w) {
 
   /* Fill in */
+	//release all wizard threads when either team wins
 	
-
   return;
 }
 
@@ -43,22 +43,16 @@ int check_winner(struct cube * cube) {
 
 	//Check if all members of teamA are frozen
 	for (i = 0; i < cube->teamA_size; i++){
-		printf("i: %d\n", i);
-		printf("status: %d\n", cube->teamA_wizards[i]->status);
 		if (cube->teamA_wizards[i]->status == 0 ) break;
-		//If all members of teamA were frozen, team b Wins
-		if (i = cube->teamA_size - 1) bWin = true;
+		if (i = cube->teamA_size - 1) bWin = true;		//If all members of teamA were frozen, team b Wins
 	}
-
+	
 	//Check if all members of teamB are frozen
 	for (i = 0; i < cube->teamB_size; i++){
-		printf("i: %d\n", i);
-		printf("status: %d\n", cube->teamA_wizards[i]->status);
 		if (cube->teamB_wizards[i]->status == 0 ) break;
-		//If all members of teamB were frozen, team a Wins
-		if (i = cube->teamB_size - 1) aWin = true;
+		if (i = cube->teamB_size - 1) aWin = true;		//If all members of teamB were frozen, team a Wins
 	}
-
+	
 	//Print results
 	printf("Did teamA win?: %s\n", aWin ? "true" : "false");
 	printf("Did teamB win?: %s\n", bWin ? "true" : "false");
@@ -219,7 +213,7 @@ int interface(void * cube_ref) {
         /* Start the game */
 
         /* Fill in */
-				check_winner(cube);
+				if (check_winner(cube) != 0)
 
       }
     }
@@ -505,7 +499,7 @@ int fight_wizard(struct wizard * self, struct wizard * other, struct room * room
       other->team, other->id);
 
     /* Fill in */
-
+		kill_wizards(other);	//freeze other
   }
 
   /* Self freezes and release the lock */
@@ -516,7 +510,8 @@ int fight_wizard(struct wizard * self, struct wizard * other, struct room * room
       other->team, other->id);
 
     /* Fill in */
-
+		kill_wizards(self);	//freeze self
+		
     return 1;
   }
   return 0;
@@ -536,6 +531,7 @@ int free_wizard(struct wizard * self, struct wizard * other, struct room * room)
       other->team, other->id);
 
     /* Fill in */
+		other->status = 0;
 
   }
 
