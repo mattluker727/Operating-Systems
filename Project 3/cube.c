@@ -195,22 +195,9 @@ int interface(void * cube_ref) {
 
       }
     }
-		
+	  
 	  else if (!strcmp(command, "s")){
-		int randomBit = rand() % 2;
-		printf("%i\n", randomBit);
 
-		if(randomBit == 0){
-			randomBit = rand() % cube->teamA_size;
-			wizard_func(cube->teamA_wizards[randomBit]);
-		}
-		else{
-			randomBit = rand() % cube->teamB_size;
-			printf("rand bit %i team size %i\n", randomBit, cube->teamB_size);
-			wizard_func(cube->teamB_wizards[randomBit]);
-		}
-
-		//for(i = 0; i < sizeof(cube->teamB_size); i++) printf("step %i\n", i);
 	}
 	  else if (!strcmp(command, "c")){
 		printf("complete\n");
@@ -383,7 +370,15 @@ int main(int argc, char ** argv) {
     cube->teamB_wizards[i] = wizard_descr;
   }
 
-  /* Fill in */
+  /* Fill in *////
+
+	pthread_t thread0;
+	for(i = 0; i < cube->teamA_size; i++){
+		pthread_create(&thread0, NULL, wizard_func, cube->teamA_wizards[i]);
+	}
+	for(i = 0; i < cube->teamB_size; i++){
+		pthread_create(&thread0, NULL, wizard_func, cube->teamB_wizards[i]);
+	}
 
   /* Goes in the interface loop */
   res = interface(cube);
@@ -426,7 +421,7 @@ int try_room(struct wizard * w, struct room * oldroom, struct room * newroom) {
 
   /* Fill in */
 
-  return 1;
+  return 0;
 
 }
 

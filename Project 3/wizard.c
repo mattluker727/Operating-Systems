@@ -32,6 +32,7 @@ void * wizard_func(void * wizard_descr) {
 
       /* Loops until he's able to get a hold on both the old and new rooms */
       while (1) {
+
         printf("Wizard %c%d in room (%d,%d) wants to go to room (%d,%d)\n",
           self->team, self->id, oldroom->x, oldroom->y, newroom->x, newroom->y);
 
@@ -45,7 +46,7 @@ void * wizard_func(void * wizard_descr) {
           /* Goes back to the initial state and try again */
           continue;
         }
-				else {
+		else {
           break;
         }
       }
@@ -68,7 +69,7 @@ void * wizard_func(void * wizard_descr) {
           self->team, self->id, newroom->x, newroom->y);
         /* Fill in */
       }
-			else {
+	  else {
         /* Other is from opposite team */
         if (other->team != self->team) {
 
@@ -79,7 +80,7 @@ void * wizard_func(void * wizard_descr) {
 
             fight_wizard(self, other, newroom);
           }
-					else {
+		  else {
             printf("Wizard %c%d in room (%d,%d) finds enemy already frozen\n",
               self->team, self->id, newroom->x, newroom->y);
 
@@ -102,7 +103,9 @@ void * wizard_func(void * wizard_descr) {
 
       oldroom = newroom;
       newroom = choose_room(self);
+	  
     }
+	
 
     return NULL;
   }
