@@ -54,9 +54,13 @@ int check_winner(struct cube * cube) {
 	}
 	
 	//Print results
-	printf("Did teamA win?: %s\n", aWin ? "true" : "false");
-	printf("Did teamB win?: %s\n", bWin ? "true" : "false");
-
+	//printf("Did teamA win?: %s\n", aWin ? "true" : "false");
+	//printf("Did teamB win?: %s\n", bWin ? "true" : "false");
+	
+	//Return result
+	if (aWin) return 1;
+	else if (bWin) return 2;
+	
   return 0;
 }
 
@@ -213,7 +217,12 @@ int interface(void * cube_ref) {
         /* Start the game */
 
         /* Fill in */
-				if (check_winner(cube) != 0)
+
+				//Check winner
+				if (check_winner(cube) != 0){
+					if (check_winner(cube) == 1) printf("Team A won the game!");
+					else if (check_winner(cube) == 2) printf("Team B won the game!");
+				}
 
       }
     }
