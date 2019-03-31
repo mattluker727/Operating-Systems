@@ -472,6 +472,11 @@ void switch_rooms(struct wizard * w, struct room * oldroom, struct room * newroo
   }
 
   /* Fill in */
+	//check if one person in old room, this means it WAS full
+  if (oldroom->wizards[0] != NULL || oldroom->wizards[0] != NULL){
+		//unlock old room
+		
+	}
 
   /* Updates room wizards and determines opponent */
   if (newroom->wizards[0] == NULL) {
