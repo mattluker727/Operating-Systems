@@ -9,6 +9,7 @@
 #include "wizard.h"
 
 void * wizard_func(void * wizard_descr) {
+
     struct cube * cube;
     struct room * newroom;
     struct room * oldroom;
@@ -29,6 +30,9 @@ void * wizard_func(void * wizard_descr) {
 
     /* Infinite loop */
     while (1) {
+
+		  //Inserted
+		  while(sem_wait(&semW));
 
       /* Loops until he's able to get a hold on both the old and new rooms */
       while (1) {
@@ -103,10 +107,12 @@ void * wizard_func(void * wizard_descr) {
 
       oldroom = newroom;
       newroom = choose_room(self);
-	  
+
+		  //Inserted
+		  sem_post(&semI);	  
     }
-	
+
+
 
     return NULL;
   }
-

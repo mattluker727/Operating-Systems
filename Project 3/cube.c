@@ -10,6 +10,8 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include <semaphore.h>
+
 #include "cube.h"
 #include "wizard.h"
 
@@ -19,6 +21,7 @@
 #define HOWBUSY 100000000
 #define TRUE 1
 #define FALSE 0
+
 
 void command_line_usage() {
 
@@ -153,6 +156,9 @@ struct wizard * init_wizard(struct cube * cube, char team, int id) {
 
 int interface(void * cube_ref) {
 
+  //Inserted
+  while(sem_wait(&semI));
+
   struct cube * cube;
   char * line;
   char * command;
@@ -197,6 +203,13 @@ int interface(void * cube_ref) {
     }
 	  
 	  else if (!strcmp(command, "s")){
+			//if(cube->game_status != 0){
+			//	printf("Game has not been started yet!\n");
+			//}
+			//else{
+			//	sem_post(&semW);
+			//}
+			sem_post(&semW);
 
 	}
 	  else if (!strcmp(command, "c")){
@@ -215,7 +228,7 @@ int interface(void * cube_ref) {
 
     free(line);
   }
-
+  
   return 0;
 }
 
@@ -371,8 +384,14 @@ int main(int argc, char ** argv) {
   }
 
   /* Fill in *////
-
+	//Inserted
 	pthread_t thread0;
+  if(sem_init(&semI, 0, 1) == -1) printf("FAIL \n");
+  
+  int sval;
+  int sem_getvalue(sem_t *semI, int *sval);
+  printf("semI on creation: %i\n", sval);
+  sem_init(&semW, 0, 0);
 	for(i = 0; i < cube->teamA_size; i++){
 		pthread_create(&thread0, NULL, wizard_func, cube->teamA_wizards[i]);
 	}

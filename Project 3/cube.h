@@ -2,10 +2,14 @@
 
 #ifndef _CUBE_H
 #define _CUBE_H
-
+#include <semaphore.h>
 #define SOLUTION
 
 struct cube;
+
+//inserted
+sem_t semI;
+sem_t semW;
 
 struct wizard {
   int x;
