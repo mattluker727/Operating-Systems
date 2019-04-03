@@ -440,6 +440,11 @@ int try_room(struct wizard * w, struct room * oldroom, struct room * newroom) {
 
   /* Fill in */
 
+	if(newroom->wizards[0] != NULL && newroom->wizards[1] != NULL){
+		return 1;
+	}
+
+
   return 0;
 
 }
@@ -514,7 +519,7 @@ int fight_wizard(struct wizard * self, struct wizard * other, struct room * room
       other->team, other->id);
 
     /* Fill in */
-
+		other->status = 1; //freeze other
   }
 
   /* Self freezes and release the lock */
@@ -525,9 +530,11 @@ int fight_wizard(struct wizard * self, struct wizard * other, struct room * room
       other->team, other->id);
 
     /* Fill in */
+		self->status = 1; //freeze self
 
     return 1;
   }
+	
   return 0;
 }
 
@@ -545,13 +552,17 @@ int free_wizard(struct wizard * self, struct wizard * other, struct room * room)
       other->team, other->id);
 
     /* Fill in */
-
+		other->status = 0;
   }
-
+	
   /* The spell failed */
-  printf("Wizard %c%d in room (%d,%d) fails to unfreeze friend %c%d\n",
-    self->team, self->id, room->x, room->y,
-    other->team, other->id);
-
+	else {
+  	printf("Wizard %c%d in room (%d,%d) fails to unfreeze friend %c%d\n",
+    	self->team, self->id, room->x, room->y,
+    	other->team, other->id);
+		
+		return 1;	
+	}
+	
   return 0;
 }

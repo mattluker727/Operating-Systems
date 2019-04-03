@@ -32,11 +32,17 @@ void * wizard_func(void * wizard_descr) {
     while (1) {
 
 		  //Inserted
+			
 		  while(sem_wait(&semW));
-
+			while (self->status == 1){
+				sem_wait(&semW);
+			}
       /* Loops until he's able to get a hold on both the old and new rooms */
       while (1) {
-
+				//Inserted
+				printf("my status: %d\n", self->status);				
+				//End Inserted
+				
         printf("Wizard %c%d in room (%d,%d) wants to go to room (%d,%d)\n",
           self->team, self->id, oldroom->x, oldroom->y, newroom->x, newroom->y);
 
@@ -48,9 +54,21 @@ void * wizard_func(void * wizard_descr) {
           newroom = choose_room(self);
 
           /* Goes back to the initial state and try again */
+
+
+					//Inserted
+					printf("Request denied, room locked!\n");
+				
+					while(sem_wait(&semW));
+					while (self->status == 1){
+						sem_wait(&semW);
+					}
+					//EndInsert
+
+
           continue;
         }
-		else {
+				else {
           break;
         }
       }
