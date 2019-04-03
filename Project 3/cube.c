@@ -155,9 +155,9 @@ struct wizard * init_wizard(struct cube * cube, char team, int id) {
 }
 
 int interface(void * cube_ref) {
+	//Inserted
+	//while(sem_wait(&semI));
 
-  //Inserted
-  while(sem_wait(&semI));
 
   struct cube * cube;
   char * line;
@@ -169,6 +169,9 @@ int interface(void * cube_ref) {
 
   using_history();
   while (1) {
+		//Inserted
+		while(sem_wait(&semI));
+
     line = readline("cube> ");
     if (line == NULL) continue;
     if (strlen(line) == 0) continue;
@@ -211,10 +214,10 @@ int interface(void * cube_ref) {
 			//}
 			sem_post(&semW);
 
-	}
+		}
 	  else if (!strcmp(command, "c")){
-		printf("complete\n");
-	}
+			printf("complete\n");
+		}
 
 
 

@@ -35,6 +35,8 @@ void * wizard_func(void * wizard_descr) {
 			
 		  while(sem_wait(&semW));
 			while (self->status == 1){
+				printf("while1\n");
+				sem_post(&semI);
 				sem_wait(&semW);
 			}
       /* Loops until he's able to get a hold on both the old and new rooms */
@@ -58,9 +60,12 @@ void * wizard_func(void * wizard_descr) {
 
 					//Inserted
 					printf("Request denied, room locked!\n");
-				
+
+					sem_post(&semI);
+
 					while(sem_wait(&semW));
 					while (self->status == 1){
+						printf("while2\n");
 						sem_wait(&semW);
 					}
 					//EndInsert
