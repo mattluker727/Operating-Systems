@@ -35,10 +35,12 @@ void * wizard_func(void * wizard_descr) {
 			
 		  while(sem_wait(&semW));
 			while (self->status == 1){
-				printf("while1\n");
+				skipIf = true;
 				sem_post(&semI);
 				sem_wait(&semW);
 			}
+			skipIf = false;
+			
       /* Loops until he's able to get a hold on both the old and new rooms */
       while (1) {
 				//Inserted
@@ -65,9 +67,11 @@ void * wizard_func(void * wizard_descr) {
 
 					while(sem_wait(&semW));
 					while (self->status == 1){
-						printf("while2\n");
+						skipIf = true;
 						sem_wait(&semW);
 					}
+					skipIf = false;
+
 					//EndInsert
 
 
@@ -107,7 +111,7 @@ void * wizard_func(void * wizard_descr) {
 
             fight_wizard(self, other, newroom);
           }
-		  else {
+		  		else {
             printf("Wizard %c%d in room (%d,%d) finds enemy already frozen\n",
               self->team, self->id, newroom->x, newroom->y);
 
@@ -130,8 +134,21 @@ void * wizard_func(void * wizard_descr) {
 
       oldroom = newroom;
       newroom = choose_room(self);
-
+			
 		  //Inserted
+			int winner = -1;
+			winner = check_winner(cube);
+			int fill;
+			if (winner == 1){
+				printf("Team A Won!\n") ;
+				//sem_post(&semI);
+				//pthread_exit(&fill);
+			}
+			if (winner == 2){
+				printf("Team B Won!\n");
+				//sem_post(&semI);
+				//pthread_exit(&fill);
+			}			
 		  sem_post(&semI);	  
     }
 

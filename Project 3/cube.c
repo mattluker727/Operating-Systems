@@ -10,8 +10,6 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-#include <semaphore.h>
-
 #include "cube.h"
 #include "wizard.h"
 
@@ -35,10 +33,35 @@ void kill_wizards(struct wizard * w) {
   return;
 }
 
+
 int check_winner(struct cube * cube) {
-
+	
   /* Fill in */
+	bool aWin = false;
+	bool bWin = false;
+	int i;
 
+	//Check if all members of teamA are frozen
+	for (i = 0; i < cube->teamA_size; i++){
+		if (cube->teamA_wizards[i]->status == 0 ) break;
+		if (i == cube->teamA_size - 1) bWin = true;		//If all members of teamA were frozen, team b Wins
+	
+	}
+	
+	//Check if all members of teamB are frozen
+	for (i = 0; i < cube->teamB_size; i++){
+		if (cube->teamB_wizards[i]->status == 0 ) break;
+		if (i == cube->teamB_size - 1) aWin = true;		//If all members of teamB were frozen, team a Wins
+	}
+	
+	//Print results
+	//printf("Did teamA win?: %s\n", aWin ? "true" : "false");
+	//printf("Did teamB win?: %s\n", bWin ? "true" : "false");
+	
+	//Return result
+	if (aWin) return 1;
+	else if (bWin) return 2;
+	
   return 0;
 }
 
@@ -172,6 +195,11 @@ int interface(void * cube_ref) {
 		//Inserted
 		while(sem_wait(&semI));
 
+		while (skipIf){
+			sem_post(&semW);
+			sem_wait(&semI);
+		}
+		
     line = readline("cube> ");
     if (line == NULL) continue;
     if (strlen(line) == 0) continue;
@@ -187,6 +215,7 @@ int interface(void * cube_ref) {
     }
 		else if (!strcmp(command, "show")) {
       print_cube(cube);
+			sem_post(&semI);
     }
 		else if (!strcmp(command, "start")) {
       if (cube->game_status == 1) {
