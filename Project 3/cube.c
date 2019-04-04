@@ -21,6 +21,7 @@
 #define TRUE 1
 #define FALSE 0
 
+
 void command_line_usage() {
 
   fprintf(stderr, "-size <size of cube> -teamA <size of team> -teamB <size of team> -seed <seed value>\n");
@@ -44,13 +45,13 @@ int check_winner(struct cube * cube) {
 	//Check if all members of teamA are frozen
 	for (i = 0; i < cube->teamA_size; i++){
 		if (cube->teamA_wizards[i]->status == 0 ) break;
-		if (i = cube->teamA_size - 1) bWin = true;		//If all members of teamA were frozen, team b Wins
+		if (i == cube->teamA_size - 1) bWin = true;		//If all members of teamA were frozen, team b Wins
 	}
 	
 	//Check if all members of teamB are frozen
 	for (i = 0; i < cube->teamB_size; i++){
 		if (cube->teamB_wizards[i]->status == 0 ) break;
-		if (i = cube->teamB_size - 1) aWin = true;		//If all members of teamB were frozen, team a Wins
+		if (i == cube->teamB_size - 1) aWin = true;		//If all members of teamB were frozen, team a Wins
 	}
 	
 	//Print results
@@ -177,6 +178,9 @@ struct wizard * init_wizard(struct cube * cube, char team, int id) {
 }
 
 int interface(void * cube_ref) {
+	//Inserted
+	//while(sem_wait(&semI));
+
 
   struct cube * cube;
   char * line;
@@ -188,6 +192,14 @@ int interface(void * cube_ref) {
 
   using_history();
   while (1) {
+		//Inserted
+		while(sem_wait(&semI));
+
+		while (skipIf){
+			sem_post(&semW);
+			sem_wait(&semI);
+		}
+		
     line = readline("cube> ");
     if (line == NULL) continue;
     if (strlen(line) == 0) continue;
@@ -203,6 +215,7 @@ int interface(void * cube_ref) {
     }
 		else if (!strcmp(command, "show")) {
       print_cube(cube);
+			sem_post(&semI);
     }
 		else if (!strcmp(command, "start")) {
       if (cube->game_status == 1) {
@@ -227,14 +240,25 @@ int interface(void * cube_ref) {
       }
     }
 
+	  //Inserted
 	  else if (!strcmp(command, "s")){
-		printf("step\n");
-	}
+			//if(cube->game_status != 0){
+			//	printf("Game has not been started yet!\n");
+			//}
+			//else{
+			//	sem_post(&semW);
+			//}
+			printf("step\n");
+			sem_post(&semW);
+		}
+
 	  else if (!strcmp(command, "c")){
-		printf("complete\n");
-	}
-
-
+			printf("complete\n");
+      complete = true;
+      printf("complete: %s\n", complete ? "true" : "false");
+      sem_post(&semW);
+		}
+    //End Inserted
 
 		else if (!strcmp(command, "stop")) {
       /* Stop the game */
@@ -246,7 +270,7 @@ int interface(void * cube_ref) {
 
     free(line);
   }
-
+  
   return 0;
 }
 
@@ -401,7 +425,26 @@ int main(int argc, char ** argv) {
     cube->teamB_wizards[i] = wizard_descr;
   }
 
-  /* Fill in */
+  /* Fill in *////
+	//Inserted
+	pthread_t thread0;
+  if(sem_init(&semI, 0, 1) == -1) printf("FAIL \n");
+  
+  //int sval;
+  //int sem_getvalue(sem_t *semI, int *sval);
+  //printf("semI on creation: %i\n", sval);
+
+  //int sem_getvalue(sem_t *semW, int *sval);
+  //printf("semW on creation: %i\n", sval);
+
+  sem_init(&semW, 0, 0);
+	for(i = 0; i < cube->teamA_size; i++){
+		pthread_create(&thread0, NULL, wizard_func, cube->teamA_wizards[i]);
+	}
+	for(i = 0; i < cube->teamB_size; i++){
+		pthread_create(&thread0, NULL, wizard_func, cube->teamB_wizards[i]);
+	}
+  //End Inserted
 
   /* Goes in the interface loop */
   res = interface(cube);
@@ -444,7 +487,12 @@ int try_room(struct wizard * w, struct room * oldroom, struct room * newroom) {
 
   /* Fill in */
 
-  return 1;
+	if(newroom->wizards[0] != NULL && newroom->wizards[1] != NULL){
+		return 1;
+	}
+
+
+  return 0;
 
 }
 
@@ -523,7 +571,7 @@ int fight_wizard(struct wizard * self, struct wizard * other, struct room * room
       other->team, other->id);
 		
     /* Fill in */
-		other->status = 1;	//freeze other
+		other->status = 1; //freeze other
   }
 
   /* Self freezes and release the lock */
@@ -534,10 +582,10 @@ int fight_wizard(struct wizard * self, struct wizard * other, struct room * room
       other->team, other->id);
 
     /* Fill in */
-		self->status = 1;	//freeze self
-		
+		self->status = 1; //freeze self
     return 1;
   }
+	
   return 0;
 }
 
@@ -556,13 +604,16 @@ int free_wizard(struct wizard * self, struct wizard * other, struct room * room)
 
     /* Fill in */
 		other->status = 0;
-
   }
-
+	
   /* The spell failed */
-  printf("Wizard %c%d in room (%d,%d) fails to unfreeze friend %c%d\n",
-    self->team, self->id, room->x, room->y,
-    other->team, other->id);
-
+	else {
+  	printf("Wizard %c%d in room (%d,%d) fails to unfreeze friend %c%d\n",
+    	self->team, self->id, room->x, room->y,
+    	other->team, other->id);
+		
+		return 1;	
+	}
+	
   return 0;
 }

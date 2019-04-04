@@ -2,10 +2,18 @@
 
 #ifndef _CUBE_H
 #define _CUBE_H
-
+#include <stdbool.h>
+#include <semaphore.h>
 #define SOLUTION
 
 struct cube;
+
+//inserted
+sem_t semI;
+sem_t semW;
+
+bool skipIf;
+bool complete;
 
 struct wizard {
   int x;

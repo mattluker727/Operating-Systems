@@ -9,6 +9,7 @@
 #include "wizard.h"
 
 void * wizard_func(void * wizard_descr) {
+
     struct cube * cube;
     struct room * newroom;
     struct room * oldroom;
@@ -30,8 +31,23 @@ void * wizard_func(void * wizard_descr) {
     /* Infinite loop */
     while (1) {
 
+		  //Inserted
+			
+		  while(sem_wait(&semW));
+			while (self->status == 1){
+				skipIf = true;
+				if(!complete) sem_post(&semI);
+        else sem_post(&semW);
+				sem_wait(&semW);
+			}
+			skipIf = false;
+			
       /* Loops until he's able to get a hold on both the old and new rooms */
       while (1) {
+				//Inserted
+				//printf("my status: %d\n", self->status);				
+				//End Inserted
+				
         printf("Wizard %c%d in room (%d,%d) wants to go to room (%d,%d)\n",
           self->team, self->id, oldroom->x, oldroom->y, newroom->x, newroom->y);
 
@@ -43,6 +59,24 @@ void * wizard_func(void * wizard_descr) {
           newroom = choose_room(self);
 
           /* Goes back to the initial state and try again */
+
+
+					//Inserted
+					printf("Request denied, room locked!\n");
+
+					if(!complete) sem_post(&semI);
+          else sem_post(&semW);
+
+					while(sem_wait(&semW));
+					while (self->status == 1){
+						skipIf = true;
+						sem_wait(&semW);
+					}
+					skipIf = false;
+
+					//EndInsert
+
+
           continue;
         }
 				else {
@@ -68,7 +102,7 @@ void * wizard_func(void * wizard_descr) {
           self->team, self->id, newroom->x, newroom->y);
         /* Fill in */
       }
-			else {
+	  else {
         /* Other is from opposite team */
         if (other->team != self->team) {
 
@@ -79,7 +113,7 @@ void * wizard_func(void * wizard_descr) {
 
             fight_wizard(self, other, newroom);
           }
-					else {
+		  		else {
             printf("Wizard %c%d in room (%d,%d) finds enemy already frozen\n",
               self->team, self->id, newroom->x, newroom->y);
 
@@ -102,8 +136,28 @@ void * wizard_func(void * wizard_descr) {
 
       oldroom = newroom;
       newroom = choose_room(self);
+			
+		  //Inserted
+			int winner = -1;
+			winner = check_winner(cube);
+			int fill;
+			if (winner == 1){
+				printf("Team A Won!\n") ;
+				//if(!complete) sem_post(&semI);
+        //else sem_post(&semW);
+				//pthread_exit(&fill);
+			}
+			if (winner == 2){
+				printf("Team B Won!\n");
+				//if(!complete) sem_post(&semI);
+        //else sem_post(&semW);
+				//pthread_exit(&fill);
+			}			
+		  if(!complete) sem_post(&semI);
+      else sem_post(&semW);
     }
+
+
 
     return NULL;
   }
-
