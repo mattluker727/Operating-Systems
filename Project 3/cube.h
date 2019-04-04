@@ -13,6 +13,7 @@ sem_t semI;
 sem_t semW;
 
 bool skipIf;
+bool complete;
 
 struct wizard {
   int x;

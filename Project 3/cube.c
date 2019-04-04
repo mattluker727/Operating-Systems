@@ -233,7 +233,8 @@ int interface(void * cube_ref) {
 
       }
     }
-	  
+
+	  //Inserted
 	  else if (!strcmp(command, "s")){
 			//if(cube->game_status != 0){
 			//	printf("Game has not been started yet!\n");
@@ -241,14 +242,17 @@ int interface(void * cube_ref) {
 			//else{
 			//	sem_post(&semW);
 			//}
+			printf("step\n");
 			sem_post(&semW);
-
 		}
+
 	  else if (!strcmp(command, "c")){
 			printf("complete\n");
+      complete = true;
+      printf("complete: %s\n", complete ? "true" : "false");
+      sem_post(&semW);
 		}
-
-
+    //End Inserted
 
 		else if (!strcmp(command, "stop")) {
       /* Stop the game */
@@ -420,9 +424,13 @@ int main(int argc, char ** argv) {
 	pthread_t thread0;
   if(sem_init(&semI, 0, 1) == -1) printf("FAIL \n");
   
-  int sval;
-  int sem_getvalue(sem_t *semI, int *sval);
-  printf("semI on creation: %i\n", sval);
+  //int sval;
+  //int sem_getvalue(sem_t *semI, int *sval);
+  //printf("semI on creation: %i\n", sval);
+
+  //int sem_getvalue(sem_t *semW, int *sval);
+  //printf("semW on creation: %i\n", sval);
+
   sem_init(&semW, 0, 0);
 	for(i = 0; i < cube->teamA_size; i++){
 		pthread_create(&thread0, NULL, wizard_func, cube->teamA_wizards[i]);
@@ -430,6 +438,7 @@ int main(int argc, char ** argv) {
 	for(i = 0; i < cube->teamB_size; i++){
 		pthread_create(&thread0, NULL, wizard_func, cube->teamB_wizards[i]);
 	}
+  //End Inserted
 
   /* Goes in the interface loop */
   res = interface(cube);
