@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <stdbool.h>
 
 #include "cube.h"
 #include "wizard.h"
@@ -29,10 +30,10 @@ void command_line_usage() {
 void kill_wizards(struct wizard * w) {
 
   /* Fill in */
-
+	//release all wizard threads when either team wins
+	
   return;
 }
-
 
 int check_winner(struct cube * cube) {
 	
@@ -45,7 +46,6 @@ int check_winner(struct cube * cube) {
 	for (i = 0; i < cube->teamA_size; i++){
 		if (cube->teamA_wizards[i]->status == 0 ) break;
 		if (i == cube->teamA_size - 1) bWin = true;		//If all members of teamA were frozen, team b Wins
-	
 	}
 	
 	//Check if all members of teamB are frozen
@@ -230,6 +230,12 @@ int interface(void * cube_ref) {
         /* Start the game */
 
         /* Fill in */
+
+				//Check winner
+				if (check_winner(cube) != 0){
+					if (check_winner(cube) == 1) printf("Team A won the game!");
+					else if (check_winner(cube) == 2) printf("Team B won the game!");
+				}
 
       }
     }
@@ -524,6 +530,11 @@ void switch_rooms(struct wizard * w, struct room * oldroom, struct room * newroo
   }
 
   /* Fill in */
+	//check if one person in old room, this means it WAS full
+  if (oldroom->wizards[0] != NULL || oldroom->wizards[0] != NULL){
+		//unlock old room
+		
+	}
 
   /* Updates room wizards and determines opponent */
   if (newroom->wizards[0] == NULL) {
@@ -558,7 +569,7 @@ int fight_wizard(struct wizard * self, struct wizard * other, struct room * room
     printf("Wizard %c%d in room (%d,%d) freezes enemy %c%d\n",
       self->team, self->id, room->x, room->y,
       other->team, other->id);
-
+		
     /* Fill in */
 		other->status = 1; //freeze other
   }
@@ -572,7 +583,6 @@ int fight_wizard(struct wizard * self, struct wizard * other, struct room * room
 
     /* Fill in */
 		self->status = 1; //freeze self
-
     return 1;
   }
 	
