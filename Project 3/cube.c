@@ -65,14 +65,16 @@ int check_winner(struct cube * cube) {
 
   //Release all threads when game is over
   if (isWinner){
-    // int i;
-    
-    // for(i = 0; i < cube->teamA_size; i++){
-    //   kill_wizards(cube->teamA_wizards[i]);
-    // }
-    // for(i = 0; i < cube->teamB_size; i++){
-    //   kill_wizards(cube->teamB_wizards[i]);
-    // }
+		int i;
+		
+		//for(i = 0; i < cube->teamA_size; i++){
+		//	if (cube->teamA_wizards[i]->status == 1) printf("Frozen A\n");
+   	//	kill_wizards(cube->teamA_wizards[i]);
+  	//}
+   	//for(i = 0; i < cube->teamB_size; i++){
+		//	if (cube->teamB_wizards[i]->status == 1) printf("Frozen B\n");
+		//	kill_wizards(cube->teamB_wizards[i]);
+		//}
   }
 	
 	//Return result
