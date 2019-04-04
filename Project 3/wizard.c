@@ -36,8 +36,7 @@ void * wizard_func(void * wizard_descr) {
 		  while(sem_wait(&semW));
 			while (self->status == 1){
 				skipIf = true;
-				if(!complete) sem_post(&semI);
-        else sem_post(&semW);
+				sem_post(&semI);
 				sem_wait(&semW);
 			}
 			skipIf = false;
@@ -64,8 +63,7 @@ void * wizard_func(void * wizard_descr) {
 					//Inserted
 					printf("Request denied, room locked!\n");
 
-					if(!complete) sem_post(&semI);
-          else sem_post(&semW);
+					sem_post(&semI);
 
 					while(sem_wait(&semW));
 					while (self->status == 1){
@@ -133,31 +131,12 @@ void * wizard_func(void * wizard_descr) {
 
       /* Thinks about what to do next */
       dostuff();
-
+      
       oldroom = newroom;
       newroom = choose_room(self);
-			
-		  //Inserted
-			int winner = -1;
-			winner = check_winner(cube);
-			int fill;
-			if (winner == 1){
-				printf("Team A Won!\n") ;
-				//if(!complete) sem_post(&semI);
-        //else sem_post(&semW);
-				//pthread_exit(&fill);
-			}
-			if (winner == 2){
-				printf("Team B Won!\n");
-				//if(!complete) sem_post(&semI);
-        //else sem_post(&semW);
-				//pthread_exit(&fill);
-			}			
-		  if(!complete) sem_post(&semI);
-      else sem_post(&semW);
+      
+		  sem_post(&semI);
     }
-
-
 
     return NULL;
   }
