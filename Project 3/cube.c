@@ -255,26 +255,38 @@ int interface(void * cube_ref) {
     }
 
 	  //Inserted
-	  else if (!strcmp(command, "s")){
-			printf("step\n");
-
+	  else if (!strcmp(command, "s") && !isWinner){
 			sem_post(&semW);
 		}
-
-	  else if (!strcmp(command, "c")){
-			printf("complete\n");
+		
+	  else if (!strcmp(command, "c") && !isWinner){
       complete = true;
-
+			
       sem_post(&semW);
 		}
+
+		else if (!strcmp(command, "kill")){
+			isWinner = true;
+			check_winner(cube);
+		}
+		
     //End Inserted
 
 		else if (!strcmp(command, "stop")) {
       /* Stop the game */
       return 1;
     }
+		
+		//Inserted
+		else if (isWinner) {
+      fprintf(stderr, "game is complete, please type show or exit\n");
+			sem_post(&semI);
+    }
+		//End Inserted
+
 		else {
-      fprintf(stderr, "unknown command %s\n", command);
+      fprintf(stderr, "unknown command \"%s\"\n", command);
+			sem_post(&semI);
     }
 
     free(line);

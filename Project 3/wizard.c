@@ -49,7 +49,7 @@ void * wizard_func(void * wizard_descr) {
       while (1) {
 				//Inserted
 				//printf("my status: %d\n", self->status);				
-				//End Inserted
+			//End Inserted
 				
         printf("Wizard %c%d in room (%d,%d) wants to go to room (%d,%d)\n",
           self->team, self->id, oldroom->x, oldroom->y, newroom->x, newroom->y);
