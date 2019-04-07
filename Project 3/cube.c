@@ -29,7 +29,8 @@ void command_line_usage() {
 
 void kill_wizards(struct wizard * w){
   /* Fill in */
-  pthread_cancel(w->wizardT); //release thread of wizard passed
+	if (w->team == 'A') pthread_cancel(w->wizardTa);
+	if (w->team == 'B') pthread_cancel(w->wizardTb);
 	
   return;
 }
@@ -67,14 +68,14 @@ int check_winner(struct cube * cube) {
   if (isWinner){
 		int i;
 		
-		//for(i = 0; i < cube->teamA_size; i++){
-		//	if (cube->teamA_wizards[i]->status == 1) printf("Frozen A\n");
-   	//	kill_wizards(cube->teamA_wizards[i]);
-  	//}
-   	//for(i = 0; i < cube->teamB_size; i++){
-		//	if (cube->teamB_wizards[i]->status == 1) printf("Frozen B\n");
-		//	kill_wizards(cube->teamB_wizards[i]);
-		//}
+		for(i = 0; i < cube->teamA_size; i++){
+			if (cube->teamA_wizards[i]->status == 1) printf("Frozen A\n");
+   		kill_wizards(cube->teamA_wizards[i]);
+  	}
+   	for(i = 0; i < cube->teamB_size; i++){
+			if (cube->teamB_wizards[i]->status == 1) printf("Frozen B\n");
+			kill_wizards(cube->teamB_wizards[i]);
+		}
   }
 	
 	//Return result
@@ -279,7 +280,7 @@ int interface(void * cube_ref) {
 		
 		//Inserted
 		else if (isWinner) {
-      fprintf(stderr, "game is complete, please type show or exit\n");
+      fprintf(stderr, "game is complete, please type \"show\" or \"exit\"\n");
 			sem_post(&semI);
     }
 		//End Inserted
@@ -460,10 +461,10 @@ int main(int argc, char ** argv) {
 
   sem_init(&semW, 0, 0);
 	for(i = 0; i < cube->teamA_size; i++){
-		pthread_create(&cube->teamA_wizards[i]->wizardT, NULL, wizard_func, cube->teamA_wizards[i]);
+		pthread_create(&cube->teamA_wizards[i]->wizardTa, NULL, wizard_func, cube->teamA_wizards[i]);
 	}
 	for(i = 0; i < cube->teamB_size; i++){
-		pthread_create(&cube->teamA_wizards[i]->wizardT, NULL, wizard_func, cube->teamB_wizards[i]);
+		pthread_create(&cube->teamB_wizards[i]->wizardTb, NULL, wizard_func, cube->teamB_wizards[i]);
 	}
   //End Inserted
 
