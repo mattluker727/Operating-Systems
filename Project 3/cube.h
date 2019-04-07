@@ -14,6 +14,7 @@ sem_t semW;
 
 bool skipIf;
 bool complete;
+bool isWinner;
 
 struct wizard {
   int x;
@@ -24,6 +25,7 @@ struct wizard {
   struct cube *cube; 
 
   /* Fill in as required */
+  pthread_t wizardT;
 };
   
 struct room {

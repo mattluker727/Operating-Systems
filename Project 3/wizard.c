@@ -34,12 +34,15 @@ void * wizard_func(void * wizard_descr) {
 		  //Inserted
 			
 		  while(sem_wait(&semW));
-			while (self->status == 1){
+			while (self->status == 1){ //&& !isWinner)
 				skipIf = true;
-				if(!complete) sem_post(&semI);
-        else sem_post(&semW);
+				sem_post(&semI);
 				sem_wait(&semW);
 			}
+			//if (isWinner){
+			//	sem_wait(&semW);
+			//	sem_post(&semI);
+			//}
 			skipIf = false;
 			
       /* Loops until he's able to get a hold on both the old and new rooms */
@@ -64,14 +67,17 @@ void * wizard_func(void * wizard_descr) {
 					//Inserted
 					printf("Request denied, room locked!\n");
 
-					if(!complete) sem_post(&semI);
-          else sem_post(&semW);
-
+					sem_post(&semI);
+					
 					while(sem_wait(&semW));
-					while (self->status == 1){
+					while (self->status == 1){ //&& !isWinner)
 						skipIf = true;
 						sem_wait(&semW);
 					}
+					//if (isWinner){
+					//	sem_wait(&semW);
+					//	sem_post(&semI);
+					//}
 					skipIf = false;
 
 					//EndInsert
@@ -133,31 +139,12 @@ void * wizard_func(void * wizard_descr) {
 
       /* Thinks about what to do next */
       dostuff();
-
+      
       oldroom = newroom;
       newroom = choose_room(self);
-			
-		  //Inserted
-			int winner = -1;
-			winner = check_winner(cube);
-			int fill;
-			if (winner == 1){
-				printf("Team A Won!\n") ;
-				//if(!complete) sem_post(&semI);
-        //else sem_post(&semW);
-				//pthread_exit(&fill);
-			}
-			if (winner == 2){
-				printf("Team B Won!\n");
-				//if(!complete) sem_post(&semI);
-        //else sem_post(&semW);
-				//pthread_exit(&fill);
-			}			
-		  if(!complete) sem_post(&semI);
-      else sem_post(&semW);
+      
+		  sem_post(&semI);
     }
-
-
 
     return NULL;
   }
