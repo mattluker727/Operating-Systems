@@ -15,6 +15,7 @@ sem_t semW;
 bool skipIf;
 bool complete;
 bool isWinner;
+bool isKilled;
 
 struct wizard {
   int x;

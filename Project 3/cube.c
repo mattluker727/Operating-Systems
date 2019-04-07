@@ -61,21 +61,22 @@ int check_winner(struct cube * cube) {
 	}
 	
 	//Print results
-  if (aWin) printf("Team A won the game!\n");
-  else if (bWin) printf("Team B won the game!\n");
+  if (aWin && !isKilled) printf("Team A won the game!\n");
+  else if (bWin && !isKilled) printf("Team B won the game!\n");
 
   //Release all threads when game is over
   if (isWinner){
 		int i;
 		
 		for(i = 0; i < cube->teamA_size; i++){
-			if (cube->teamA_wizards[i]->status == 1) printf("Frozen A\n");
+			//if (cube->teamA_wizards[i]->status == 1) printf("Frozen A\n");
    		kill_wizards(cube->teamA_wizards[i]);
   	}
    	for(i = 0; i < cube->teamB_size; i++){
-			if (cube->teamB_wizards[i]->status == 1) printf("Frozen B\n");
+			//if (cube->teamB_wizards[i]->status == 1) printf("Frozen B\n");
 			kill_wizards(cube->teamB_wizards[i]);
 		}
+		isKilled = true;
   }
 	
 	//Return result
@@ -213,11 +214,13 @@ int interface(void * cube_ref) {
 		while(sem_wait(&semI));
     
     check_winner(cube);
-    
+
     //Give power back to wizard
     while (skipIf || complete){
       if (isWinner) break;
+
       check_winner(cube);
+			if (isKilled) break;
       sem_post(&semW);
       sem_wait(&semI);
     }
@@ -265,12 +268,6 @@ int interface(void * cube_ref) {
 			
       sem_post(&semW);
 		}
-
-		else if (!strcmp(command, "kill")){
-			isWinner = true;
-			check_winner(cube);
-		}
-		
     //End Inserted
 
 		else if (!strcmp(command, "stop")) {
