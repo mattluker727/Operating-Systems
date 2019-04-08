@@ -68,10 +68,11 @@ void * wizard_func(void * wizard_descr) {
 					printf("Request denied, room locked!\n");
 
 					sem_post(&semI);
-					
 					while(sem_wait(&semW));
+
 					while (self->status == 1){ //&& !isWinner)
 						skipIf = true;
+            sem_post(&semI);
 						sem_wait(&semW);
 					}
 					//if (isWinner){
