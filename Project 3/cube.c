@@ -223,6 +223,7 @@ int interface(void * cube_ref) {
 			if (isKilled) break;
       sem_post(&semW);
       sem_wait(&semI);
+      check_winner(cube);
     }
 		
     line = readline("cube> ");
