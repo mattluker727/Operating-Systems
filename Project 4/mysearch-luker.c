@@ -29,48 +29,10 @@ int main(int argc, char **argv){
          printf("cwd: %s\n", cwd);
    }
 
-   //Open and read cwd
-   DIR *myDir;
-   struct dirent *readmyDir;
+   //Initial ls and search on root folder
+   search(cwd);
 
-   myDir = opendir (cwd);
-   if (myDir == NULL) {
-      printf ("Can't open '%s'\n", cwd);
-      return 1;
-   }
-   
-   //Print ls
-   while ((readmyDir = readdir(myDir)) != NULL) {
-      //check if file is dir
-      struct stat fileStat;
-
-      char newCWD[256] = "";
-      strcat(newCWD,  cwd);
-      strcat(newCWD,  "/");
-      strcat(newCWD,  readmyDir->d_name);
-
-      if(stat(newCWD, &fileStat) < 0)    
-         return 1;
-
-      if(!strcmp(readmyDir->d_name, "..") || !strcmp(readmyDir->d_name, ".")){
-         continue;
-      }    
-
-      if (!S_ISREG(fileStat.st_mode)){
-         printf ("\n\n");
-         printf ("Found dir: '%s'\n", readmyDir->d_name);
-
-         search(newCWD);
-         printf ("End of dir: '%s'\n", readmyDir->d_name);
-      }
-      else{
-         printf ("%s\t\t", readmyDir->d_name);
-      }
-   }
-
-   printf ("\n");
-   closedir (myDir);
-   
+   printf("\nEnd of cwd: %s\n", cwd);
    return 0;
 }
 
@@ -84,7 +46,7 @@ void search(char newWD[256]){
    if (myDir == NULL) {
       printf ("Can't open '%s'\n", newWD);
    }
-
+   
    //Print ls
    while ((readmyDir = readdir(myDir)) != NULL) {
       //check if file is dir
@@ -103,30 +65,21 @@ void search(char newWD[256]){
       }
       
       // switch (fileStat.st_mode & S_IFMT) {
-      // case S_IFBLK:  printf("block device\n");            break;
-      // case S_IFCHR:  printf("character device\n");        break;
-      // case S_IFDIR:  printf("directory\n");               break;
-      // case S_IFIFO:  printf("FIFO/pipe\n");               break;
-      // case S_IFLNK:  printf("symlink\n");                 break;
-      // case S_IFREG:  printf("regular file\n");            break;
-      // case S_IFSOCK: printf("socket\n");                  break;
-      // default:       printf("unknown?\n");                break;
+      //    case S_IFDIR:  printf("directory\n");               break;
+      //    case S_IFREG:  printf("regular file\n");            break;
+      //    default:       printf("unknown?\n");                break;
       // }
       
       if (!S_ISREG(fileStat.st_mode)){
-         printf ("\n\n");
-         printf ("Found dir: '%s'\n", readmyDir->d_name);
+         printf ("\n\nFound dir: '%s'\n", readmyDir->d_name);
 
          search(newCWD);
-         printf ("End of dir: '%s'\n", readmyDir->d_name);
+         printf ("End of dir: '%s'\n\n", readmyDir->d_name);
       }
       else{
          printf ("%s\t\t", readmyDir->d_name);
       }
    }
 
-   printf ("\n\n");
-
-   printf ("\n");
    closedir (myDir);
 }
