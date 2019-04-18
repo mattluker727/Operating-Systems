@@ -18,7 +18,7 @@ int main(int argc, char **argv){
 
    if(argc >= 2){
       numLines = atoi(argv[1] + 1); //remove "-" from "-n"
-      printf("numLines: %d\n", numLines);
+      //printf("numLines: %d\n", numLines);
    }
 
    //Get file
@@ -39,14 +39,16 @@ int main(int argc, char **argv){
    if(stat(file, &fileStat) < 0)    
       return 1;
 
-   printf("Size: %d\t\t",fileStat.st_size);
-   printf("Blocks: %d\t\n",fileStat.st_blocks);
+   //printf("Size: %d\t\t",fileStat.st_size);
+   const int fileSize = fileStat.st_size;
+   printf("Size: %d\t\t",fileSize);
+   //printf("Blocks: %d\t\n",fileStat.st_blocks);
 
    //Open file
    int fd = open(file, O_RDONLY);
-
+   
    //Define max line size and buffer to read into from file
-   static const long maxLen = 60 + 1;
+   static const long maxLen = 9999 + 1;
    char buff[maxLen + 1];
 
    lseek(fd, -maxLen, SEEK_END);
@@ -56,18 +58,21 @@ int main(int argc, char **argv){
    //Find last line
    char *lastLine = strrchr(buff, '\n') + 1;
    char *tail = lastLine;
-   int count;
+   int count = numLines;
 
-   //Move backward numLines from end of file
-   while(numLines != 0){
+   //Move backward count from end of file
+   while(count != 0){
       tail--;
-      if (tail[0] == '\n') numLines--;
+      //printf("tail:%c\n", tail[0]);
+
+      if (tail[0] == '\n') count--;
    }
    
-   //Print last numLines of files
-   printf("tail: %s\n", tail);
+   tail++; //remove extra newline char
 
-   printf ("\n");
+   //Print last numLines of files
+   printf("Last %d lines in file:\n%s\n", numLines, tail);
+   
    close(fd);
 
    return 0;

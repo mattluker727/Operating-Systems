@@ -40,7 +40,7 @@ int main(int argc, char **argv){
    //Open and read cwd
    DIR *myDir;
    struct dirent *readmyDir;
-
+   
    myDir = opendir (cwd);
    if (myDir == NULL) {
       printf ("Can't open '%s'\n", cwd);
