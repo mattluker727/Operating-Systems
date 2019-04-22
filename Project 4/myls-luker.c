@@ -109,14 +109,14 @@ int main(int argc, char **argv){
          grp = getgrgid(fileStat.st_gid);
          pwd = getpwuid(fileStat.st_uid);
 
-         printf("Uid: ( %d/\t%s)\t",fileStat.st_uid, pwd->pw_name);
-         printf("Gid: ( %d/\t%s)\n",fileStat.st_gid, grp->gr_name);
+         //printf("Uid: ( %d/\t%s)\t",fileStat.st_uid, pwd->pw_name);
+         //printf("Gid: ( %d/\t%s)\n",fileStat.st_gid, grp->gr_name);
          
-         printf("Access: %s", ctime(&fileStat.st_atime));
+         printf("\nAccess: %s", ctime(&fileStat.st_atime));
          printf("Modify: %s", ctime(&fileStat.st_mtime));
          printf("Change: %s", ctime(&fileStat.st_ctime));
 
-         printf(" Birth: -\n");
+         //printf(" Birth: -\n");
       }
    }
 

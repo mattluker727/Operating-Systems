@@ -27,7 +27,7 @@ int main(int argc, char **argv){
    if(argc == 3){
       //Get file from commandline
       strncpy(file, argv[2], 100);
-      printf("file: %s\n", file);
+      //printf("file: %s\n", file);
    }
    else{
       printf("Input file needed\n");
@@ -41,7 +41,7 @@ int main(int argc, char **argv){
 
    //printf("Size: %d\t\t",fileStat.st_size);
    const int fileSize = fileStat.st_size;
-   printf("Size: %d\t\t",fileSize);
+   //printf("Size: %d\t\t",fileSize);
    //printf("Blocks: %d\t\n",fileStat.st_blocks);
 
    //Open file
