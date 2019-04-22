@@ -9,18 +9,20 @@
 #include <pwd.h>
 #include <grp.h>
 
+void ls(char cwd[256], bool showStats);
+
 int main(int argc, char **argv){
 
    //Check if showStats
    bool showStats = false;
 
    if(argc >= 2){
-      if (strcmp("-1", argv[1]) == 0){
+      if (strcmp("-l", argv[1]) == 0){
          showStats = true;
-         printf("showStats\n");
+         //printf("showStats\n");
       }
    }
-
+   
    //Get cwd
    char cwd[256];
 
@@ -37,6 +39,15 @@ int main(int argc, char **argv){
          printf("cwd: %s\n", cwd);
    }
 
+   ls(cwd, showStats);
+
+   printf("\n");
+
+   return 0;
+}
+
+void ls(char cwd[256], bool showStats){
+
    //Open and read cwd
    DIR *myDir;
    struct dirent *readmyDir;
@@ -44,7 +55,7 @@ int main(int argc, char **argv){
    myDir = opendir (cwd);
    if (myDir == NULL) {
       printf ("Can't open '%s'\n", cwd);
-      return 1;
+      return;
    }
    
    //Print ls
@@ -56,12 +67,16 @@ int main(int argc, char **argv){
       else {
          struct stat fileStat;
 
+         char newCWD[256] = "";
+         strcat(newCWD,  cwd);
+         strcat(newCWD,  "/");
+         strcat(newCWD,  readmyDir->d_name);
+         
          //skip if file is dir
-         if(stat(readmyDir->d_name, &fileStat) < 0){
+         if(stat(newCWD, &fileStat) < 0){
             continue;
-            //return 1;
          }
-
+         
          //Print info from struct
          printf("\n");
          
@@ -115,13 +130,8 @@ int main(int argc, char **argv){
          printf("Access: %s", ctime(&fileStat.st_atime));
          printf("Modify: %s", ctime(&fileStat.st_mtime));
          printf("Change: %s", ctime(&fileStat.st_ctime));
-
-         printf(" Birth: -\n");
       }
    }
-
-   printf ("\n");
    closedir (myDir);
-   
-   return 0;
+
 }

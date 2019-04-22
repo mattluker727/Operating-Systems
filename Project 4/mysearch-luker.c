@@ -46,12 +46,12 @@ void search(char newWD[256]){
    if (myDir == NULL) {
       printf ("Can't open '%s'\n", newWD);
    }
-   
+
    //Print ls
    while ((readmyDir = readdir(myDir)) != NULL) {
       //check if file is dir
       struct stat fileStat;
-
+      
       char newCWD[256] = "";
       strcat(newCWD,  newWD);
       strcat(newCWD,  "/");
@@ -71,10 +71,10 @@ void search(char newWD[256]){
       // }
       
       if (!S_ISREG(fileStat.st_mode)){
-         printf ("\n\nFound dir: '%s'\n", readmyDir->d_name);
+         printf ("\n\nFound dir: '%s'\n", newCWD);
 
          search(newCWD);
-         printf ("End of dir: '%s'\n\n", readmyDir->d_name);
+         printf ("\nEnd of dir: '%s'\n\n", newCWD);
       }
       else{
          printf ("%s\t\t", readmyDir->d_name);

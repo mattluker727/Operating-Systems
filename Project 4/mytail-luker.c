@@ -20,17 +20,17 @@ int main(int argc, char **argv){
       numLines = atoi(argv[1] + 1); //remove "-" from "-n"
       //printf("numLines: %d\n", numLines);
    }
-
+   
    //Get file
    char file[256];
 
    if(argc == 3){
       //Get file from commandline
       strncpy(file, argv[2], 100);
-      printf("file: %s\n", file);
+      //printf("file: %s\n", file);
    }
    else{
-      printf("Input file needed\n");
+      printf("Number of lines and Input file needed\n");
       return 1;
    }
    
@@ -41,7 +41,7 @@ int main(int argc, char **argv){
 
    //printf("Size: %d\t\t",fileStat.st_size);
    const int fileSize = fileStat.st_size;
-   printf("Size: %d\t\t",fileSize);
+   //printf("Size: %d\t\t",fileSize);
    //printf("Blocks: %d\t\n",fileStat.st_blocks);
 
    //Open file
