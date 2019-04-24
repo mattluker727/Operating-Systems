@@ -41,10 +41,7 @@ int main(int argc, char **argv){
       return 1;
 	}
 	
-   //printf("Size: %d\t\t",fileStat.st_size);
    const int fileSize = fileStat.st_size;
-   //printf("Size: %d\t\t",fileSize);
-   //printf("Blocks: %d\t\n",fileStat.st_blocks);
 
    //Open file
    int fd = open(file, O_RDONLY);
@@ -52,7 +49,7 @@ int main(int argc, char **argv){
    //Define max line size and buffer to read into from file
    static const long maxLen = 9999 + 1;
    char buff[maxLen + 1];
-
+	
    lseek(fd, -maxLen, SEEK_END);
    ssize_t len = read(fd, buff, maxLen);
    buff[len] = '\0';
@@ -61,7 +58,7 @@ int main(int argc, char **argv){
    char *lastLine = strrchr(buff, '\n') + 1;
    char *tail = lastLine;
    int count = numLines;
-	
+		
    //Move backward count from end of file
    while(count != -1){
       tail--;

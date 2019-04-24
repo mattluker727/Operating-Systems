@@ -63,18 +63,12 @@ void search(char newWD[256]){
       if(!strcmp(readmyDir->d_name, "..") || !strcmp(readmyDir->d_name, ".")){
          continue;
       }
-      
-      // switch (fileStat.st_mode & S_IFMT) {
-      //    case S_IFDIR:  printf("directory\n");               break;
-      //    case S_IFREG:  printf("regular file\n");            break;
-      //    default:       printf("unknown?\n");                break;
-      // }
-      
+            
       if (!S_ISREG(fileStat.st_mode)){
          printf ("\n\nFound dir: '%s'\n", readmyDir->d_name);
 
          search(newCWD);
-         printf ("End of dir: '%s'\n\n", readmyDir->d_name);
+         printf ("\nEnd of dir: '%s'\n\n", readmyDir->d_name);
       }
       else{
          printf ("%s\t\t", readmyDir->d_name);

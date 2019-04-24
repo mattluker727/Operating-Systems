@@ -1,2 +1,18 @@
-Utilized linux manual
+To compile makefile please type: "make"
 
+To run mystat:
+	"./mystat <filename>"
+
+To run myls:
+	"./myls -<any> <directory>" without stats
+	"./myls -l <directory>" with stats
+	director is optional
+	
+To run mytail:
+	"./mytail -<number of lines> <file>
+	
+To run mysearch:
+	"./mysearch <directory"
+	directory optional
+
+Thank you!
