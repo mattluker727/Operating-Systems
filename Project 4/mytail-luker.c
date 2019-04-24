@@ -36,9 +36,11 @@ int main(int argc, char **argv){
    
    //Get file stats
    struct stat fileStat;
-   if(stat(file, &fileStat) < 0)    
+   if(stat(file, &fileStat) < 0){
+      printf("Input file error\n");
       return 1;
-
+	}
+	
    //printf("Size: %d\t\t",fileStat.st_size);
    const int fileSize = fileStat.st_size;
    //printf("Size: %d\t\t",fileSize);
@@ -71,7 +73,7 @@ int main(int argc, char **argv){
    tail++; //remove extra newline char
 
    //Print last numLines of files
-   printf("Last %d lines in file:\n%s\n", numLines, tail);
+   printf("Last %d lines in file:\n%s", numLines, tail);
    
    close(fd);
 
